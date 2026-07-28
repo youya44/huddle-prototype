@@ -3,106 +3,52 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Huddle.biz | Prototype v1.0</title>
+<title>Huddle.biz | 統合プロトタイプ v2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
-  /* ===== 共通リセット + Huddle.bizカラー変数 ===== */
-  :root {
-    --huddle-navy: #1a3a6e;
-    --huddle-blue: #4a90d9;
-    --huddle-bg: #f4f6fa;
-    --huddle-text: #2b3442;
-  }
-  body { margin:0; background:var(--huddle-bg); font-family:'Noto Sans JP','Hiragino Sans',system-ui,sans-serif; color:var(--huddle-text); -webkit-font-smoothing:antialiased; }
-  a { color:var(--huddle-navy); text-decoration:none; }
+  /* GAS HtmlService想定。装飾はinline、ここはリセット+疑似クラス+画面レイアウトのみ */
+  body { margin:0; background:#f4f6fa; font-family:'Noto Sans JP','Hiragino Sans',system-ui,sans-serif; color:#2b3442; -webkit-font-smoothing:antialiased; }
+  a { color:#1a3a6e; text-decoration:none; }
   a:hover { opacity:.85; }
+  button { font-family:inherit; cursor:pointer; }
+  button:hover { filter:brightness(1.05); }
+  textarea, input, select { font-family:inherit; }
+  textarea.ans:focus, textarea.adv:focus, input.tagin:focus { outline:none; border-color:#1a3a6e !important; box-shadow:0 0 0 3px rgba(26,58,110,.12); }
+  input.search:focus, select:focus { outline:none; border-color:#4a90d9; }
   details > summary { list-style:none; cursor:pointer; }
   details > summary::-webkit-details-marker { display:none; }
   details[open] .chev { transform:rotate(180deg); }
-
-  /* ===== デモモードバー ===== */
-  #demoBar {
-    position:fixed; top:0; left:0; right:0; height:40px; z-index:1000;
-    background:var(--huddle-navy); color:#fff;
-    display:flex; align-items:center; justify-content:space-between;
-    padding:0 16px; font-size:12px; font-weight:500;
-    box-shadow:0 2px 8px rgba(0,0,0,.15);
-  }
-  #demoBar .demo-left { display:flex; align-items:center; gap:8px; font-weight:700; }
-  #demoBar .demo-center { flex:1; text-align:center; color:#c7d8ef; font-size:11px; padding:0 16px; }
-  #demoBar .demo-right select {
-    background:rgba(255,255,255,.14); color:#fff; border:1px solid rgba(255,255,255,.3);
-    border-radius:6px; padding:5px 10px; font-size:12px; font-weight:700;
-    font-family:inherit; cursor:pointer; outline:none;
-  }
-  #demoBar .demo-right select option { color:var(--huddle-navy); background:#fff; }
-  @media (max-width: 640px) {
-    #demoBar .demo-center { display:none; }
-    #demoBar .demo-left { font-size:11px; }
-  }
-
-  /* ===== ビュー切替（フェード） ===== */
-  body { padding-top:40px; }
-  .view { display:none; opacity:0; transition:opacity .15s ease; }
-  .view.active { display:block; opacity:1; }
-
-  /* ===== 学生ホーム画面 スコープ (view-student-home) ===== */
-  #view-student-home textarea { font-family:inherit; }
-  #view-student-home .layout { max-width:780px; margin:0 auto; padding:20px 16px 48px; }
-  #view-student-home .sidebar { display:none; }
+  .tab::-webkit-scrollbar { display:none; }
+  /* 画面切替 */
+  .screen { display:none; }
+  .screen.active { display:block; }
+  /* 学生ホーム: モバイル1カラム / 900px〜2カラム */
+  .sh-screen .layout { max-width:780px; margin:0 auto; padding:20px 16px 90px; }
+  .sh-screen .sidebar { display:none; }
   @media (min-width: 900px) {
-    #view-student-home .layout { display:grid; grid-template-columns:280px minmax(0,720px); gap:24px; max-width:1064px; align-items:start; }
-    #view-student-home .sidebar { display:flex; flex-direction:column; gap:16px; position:sticky; top:118px; }
-    #view-student-home .m-nav, #view-student-home .m-meetings { display:none !important; }
+    .sh-screen .layout { display:grid; grid-template-columns:280px minmax(0,720px); gap:24px; max-width:1064px; align-items:start; }
+    .sh-screen .sidebar { display:flex; flex-direction:column; gap:16px; position:sticky; top:78px; }
+    .sh-screen .m-nav, .sh-screen .m-meetings { display:none !important; }
   }
-
-  /* ===== 記入画面 スコープ (view-student-entry) ===== */
-  #view-student-entry textarea { font-family:inherit; }
-  #view-student-entry textarea.ans:focus { outline:none; border-color:var(--huddle-navy) !important; box-shadow:0 0 0 3px rgba(26,58,110,.12); }
-  #view-student-entry .tab::-webkit-scrollbar { display:none; }
-  #view-student-entry button:hover { filter:brightness(1.06); }
-
-  /* ===== 面談者画面 スコープ (view-advisor-student) ===== */
-  #view-advisor-student button { font-family:inherit; cursor:pointer; }
-  #view-advisor-student button:hover { filter:brightness(1.05); }
-  #view-advisor-student textarea, #view-advisor-student input, #view-advisor-student select { font-family:inherit; }
-  #view-advisor-student textarea.adv:focus, #view-advisor-student input.tagin:focus { outline:none; border-color:var(--huddle-navy) !important; box-shadow:0 0 0 3px rgba(26,58,110,.12); }
-  #view-advisor-student input.search:focus, #view-advisor-student select:focus { outline:none; border-color:var(--huddle-blue); }
-  #view-advisor-student .adv-layout { display:grid; grid-template-columns:300px minmax(0,1fr); gap:0; min-height:calc(100vh - 40px); }
-  #view-advisor-student .adv-sidebar { border-right:1px solid #e6eaf1; background:#ffffff; height:calc(100vh - 40px); overflow-y:auto; position:sticky; top:40px; }
+  /* 面談者: PC 2カラム / 900px未満は縦積み */
+  .adv-screen .layout { display:grid; grid-template-columns:300px minmax(0,1fr); gap:0; min-height:100vh; }
+  .adv-screen .sidebar { border-right:1px solid #e6eaf1; background:#ffffff; height:100vh; overflow-y:auto; position:sticky; top:0; }
   @media (max-width: 899px) {
-    #view-advisor-student .adv-layout { display:block; }
-    #view-advisor-student .adv-sidebar { height:auto; position:static; border-right:none; border-bottom:1px solid #e6eaf1; }
+    .adv-screen .layout { display:block; }
+    .adv-screen .sidebar { height:auto; position:static; border-right:none; border-bottom:1px solid #e6eaf1; }
   }
-
-  /* 学生ホーム内のstickyヘッダー位置調整（デモバー40pxぶんずらす） */
-  #view-student-home .home-header { top:40px !important; }
-  #view-student-entry .entry-sticky { top:40px !important; }
 </style>
 </head>
 <body>
 
-<!-- ===== デモモードバー ===== -->
-<div id="demoBar" role="banner">
-  <div class="demo-left">🎬 デモモード | Huddle.biz Prototype v1.0</div>
-  <div class="demo-center">※これは合意形成用のデモです（実データ通信なし）</div>
-  <div class="demo-right">
-    <select id="roleSelect" aria-label="ロール切替">
-      <option value="student">👤 学生ビュー</option>
-      <option value="advisor">🎓 面談者ビュー</option>
-    </select>
-  </div>
-</div>
+<!-- ================= 学生: ホーム ================= -->
+<div id="scr-student-home" class="screen sh-screen">
 
-<!-- ============================================================ -->
-<!-- ===== VIEW: 学生ホーム (#student-home) ===================== -->
-<!-- ============================================================ -->
-<section id="view-student-home" class="view">
-
-<header class="home-header" style="position:sticky;top:0;z-index:10;background:#ffffff;border-bottom:1px solid #e6eaf1">
+<!-- ===== ヘッダー ===== -->
+<header style="position:sticky;top:0;z-index:10;background:#ffffff;border-bottom:1px solid #e6eaf1">
   <div style="max-width:1064px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px">
-    <div style="font-size:20px;font-weight:900;color:#1a3a6e;letter-spacing:.02em">Huddle.biz</div>
+    <img src="data:image/png;base64,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" alt="Huddle.biz" style="height:26px;width:auto;display:block">
     <div style="display:flex;align-items:center;gap:10px">
       <div style="text-align:right">
         <div style="font-size:13px;font-weight:700;color:#1a3a6e;line-height:1.2">山田 太郎</div>
@@ -115,6 +61,7 @@
 
 <div class="layout">
 
+  <!-- ===== 左サイドバー（PCのみ）: 道のり + 面談 ===== -->
   <aside class="sidebar" aria-label="就活準備の道のり">
     <section style="background:#ffffff;border:1px solid #e6eaf1;border-radius:16px;padding:18px 16px;box-shadow:0 6px 18px -12px rgba(26,58,110,.25)">
       <h2 style="margin:0 0 12px;font-size:13px;font-weight:700;color:#5a6577">就活準備の道のり</h2>
@@ -173,8 +120,10 @@
     </section>
   </aside>
 
+  <!-- ===== メインコンテンツ ===== -->
   <main style="display:flex;flex-direction:column;gap:16px;min-width:0">
 
+    <!-- ヒーロー: 総合進捗（現在フェーズを明示） -->
     <section aria-label="就活準備の総合進捗" style="background:#ffffff;border:1px solid #e6eaf1;border-radius:16px;padding:24px 22px;box-shadow:0 6px 18px -12px rgba(26,58,110,.25)">
       <div style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#2f6fb5;background:#e3f0fc;padding:4px 12px;border-radius:99px">現在: フェーズ1 自己分析ターン（3/6 完了）</div>
       <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:12px">
@@ -187,8 +136,9 @@
       <p style="margin:12px 0 0;font-size:13px;color:#3f74b8;font-weight:500">今週は前週より +8% 進みました 🎉</p>
     </section>
 
+    <!-- 4フェーズナビ（モバイルのみ・PCはサイドバーに表示） -->
     <nav class="m-nav" aria-label="就活準備の4フェーズ" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px">
-      <a href="#student-entry" data-nav-entry aria-current="step" style="position:relative;display:block;background:linear-gradient(135deg,#1a3a6e,#2f6fb5);color:#ffffff;border:1px solid transparent;box-shadow:0 8px 20px -10px rgba(26,58,110,.5);border-radius:14px;padding:16px 14px 12px;text-decoration:none">
+      <a href="#phase1" aria-current="step" style="position:relative;display:block;background:linear-gradient(135deg,#1a3a6e,#2f6fb5);color:#ffffff;border:1px solid transparent;box-shadow:0 8px 20px -10px rgba(26,58,110,.5);border-radius:14px;padding:16px 14px 12px;text-decoration:none">
         <span style="position:absolute;top:10px;right:10px;font-size:10px;font-weight:700;padding:3px 9px;border-radius:99px;background:rgba(255,255,255,.18);color:#cfe4fa">進行中</span>
         <div style="font-size:17px;font-weight:900;color:#ffffff;padding-right:56px">自己分析</div>
         <div style="font-size:11px;font-weight:500;margin-top:2px;opacity:.7;color:#ffffff">フェーズ1</div>
@@ -218,6 +168,7 @@
       </a>
     </nav>
 
+    <!-- 現在地カード（フォーカスタスク） -->
     <section aria-label="今のミッション" style="background:linear-gradient(135deg,#16305e 0%,#24509a 55%,#3a7cc9 100%);border-radius:18px;padding:26px 22px;color:#ffffff;box-shadow:0 14px 32px -14px rgba(26,58,110,.55)">
       <div style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.08em;color:#9cc4ef">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9cc4ef" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="3"></circle></svg>
@@ -231,7 +182,7 @@
       </div>
       <div style="margin-top:12px;height:6px;border-radius:3px;background:rgba(255,255,255,.2);overflow:hidden"><div style="height:100%;width:40%;background:linear-gradient(90deg,#7db8ee,#bfe0ff);border-radius:3px"></div></div>
       <div style="margin-top:18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-        <a href="#student-entry" data-nav-entry style="display:inline-flex;align-items:center;gap:8px;background:#ffffff;color:#1a3a6e;font-weight:700;font-size:14px;padding:12px 22px;border-radius:10px">
+        <a href="#student-entry" style="display:inline-flex;align-items:center;gap:8px;background:#ffffff;color:#1a3a6e;font-weight:700;font-size:14px;padding:12px 22px;border-radius:10px">
           記入をつづける
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
         </a>
@@ -239,6 +190,7 @@
       </div>
     </section>
 
+    <!-- フェーズ1: 自己分析ターン（詳細タイムライン） -->
     <section id="phase1" aria-label="自己分析ターンの進捗" style="background:#ffffff;border:1px solid #e6eaf1;border-radius:16px;padding:22px;box-shadow:0 6px 18px -12px rgba(26,58,110,.25)">
       <h2 style="margin:0;font-size:16px;font-weight:700;color:#1a3a6e">フェーズ1: 自己分析ターン</h2>
       <p style="margin:4px 0 18px;font-size:12px;color:#8a94a6">各時期を「記入 → 面談」の順で進めます</p>
@@ -285,9 +237,9 @@
               <span style="font-size:11px;font-weight:500;color:#2f6fb5;background:#e3f0fc;padding:2px 8px;border-radius:99px">進行中</span>
             </div><div style="margin-top:3px;font-size:12px;color:#8a94a6">記入率 40%・つづきから再開できます</div>
             <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-              <a href="#student-entry" data-nav-entry style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;padding:11px 14px;border-radius:10px;color:#2f6fb5;background:#ffffff;border:1px solid #4a90d9;text-decoration:none">記入 40%</a>
+              <span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:11px 14px;border-radius:10px;color:#2f6fb5;background:#ffffff;border:1px solid #4a90d9">記入 40%</span>
               <span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:11px 14px;border-radius:10px;color:#a3adbd;background:#f7f8fb;border:1px solid #e6eaf1">面談</span>
-
+              
             </div>
           </div>
         </li>
@@ -303,7 +255,7 @@
             <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
               <span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:11px 14px;border-radius:10px;color:#a3adbd;background:#f7f8fb;border:1px solid #e6eaf1">記入</span>
               <span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:11px 14px;border-radius:10px;color:#a3adbd;background:#f7f8fb;border:1px solid #e6eaf1">面談</span>
-
+              
             </div>
           </div>
         </li>
@@ -319,7 +271,7 @@
             <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
               <span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:11px 14px;border-radius:10px;color:#a3adbd;background:#f7f8fb;border:1px solid #e6eaf1">記入</span>
               <span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:11px 14px;border-radius:10px;color:#a3adbd;background:#f7f8fb;border:1px solid #e6eaf1">面談</span>
-
+              
             </div>
           </div>
         </li>
@@ -341,6 +293,7 @@
       </ol>
     </section>
 
+    <!-- 次のマイルストーン（折りたたみ） -->
     <section aria-label="次のマイルストーン" style="display:flex;flex-direction:column;gap:10px">
       <h2 style="margin:6px 2px 0;font-size:14px;font-weight:700;color:#5a6577">次のマイルストーン</h2>
       <details id="phase2" style="background:#ffffff;border:1px solid #e6eaf1;border-radius:14px;box-shadow:0 6px 18px -12px rgba(26,58,110,.25)">
@@ -543,6 +496,7 @@
       </details>
     </section>
 
+    <!-- 直近の面談・フィードバック（モバイルのみ・PCはサイドバー） -->
     <section class="m-meetings" aria-label="直近の面談とフィードバック" style="background:#ffffff;border:1px solid #e6eaf1;border-radius:16px;padding:22px;box-shadow:0 6px 18px -12px rgba(26,58,110,.25)">
       <h2 style="margin:0 0 14px;font-size:14px;font-weight:700;color:#5a6577">直近の面談・フィードバック</h2>
       <div style="display:flex;flex-direction:column;gap:8px">
@@ -568,24 +522,22 @@
 
   </main>
 </div>
+</div>
 
-</section>
-<!-- ===== /VIEW student-home ===== -->
+<!-- ================= 学生: 記入 ================= -->
+<div id="scr-student-entry" class="screen">
 
-
-<!-- ============================================================ -->
-<!-- ===== VIEW: 記入画面 (#student-entry) ====================== -->
-<!-- ============================================================ -->
-<section id="view-student-entry" class="view">
-
-<div class="entry-sticky" style="position:sticky;top:0;z-index:10;background:#ffffff;border-bottom:1px solid #e6eaf1">
+<!-- ===== 上部固定: ヘッダー + プログレス（sticky一体） ===== -->
+<div style="position:sticky;top:0;z-index:10;background:#ffffff;border-bottom:1px solid #e6eaf1">
   <header style="max-width:800px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:10px">
     <a href="#student-home" aria-label="学生ホームへ戻る" style="display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;flex-shrink:0" onmouseover="this.style.background='#f1f4f9'" onmouseout="this.style.background='transparent'">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a3a6e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"></path></svg>
     </a>
     <h1 style="margin:0;font-size:15px;font-weight:700;color:#1a3a6e;flex:1;text-align:center">「中学校時代」の記入</h1>
+    <!-- 保存ステータス: js で切替（saved / saving / error） -->
     <div id="saveStatus" aria-live="polite" style="min-width:96px;text-align:right;font-size:12px;font-weight:500;color:#1a3a6e;transition:opacity .6s">✓ 保存済み</div>
   </header>
+  <!-- プログレス（常時可視） -->
   <div style="max-width:800px;margin:0 auto;padding:0 16px 10px">
     <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px">
       <span style="font-size:12px;font-weight:700;color:#5a6577">中学校時代</span>
@@ -599,6 +551,7 @@
 
 <main style="max-width:800px;margin:0 auto;padding:14px 16px 48px">
 
+  <!-- ===== 時期ナビ（横スクロールタブ） ===== -->
   <nav class="tab" aria-label="時期の切り替え" style="display:flex;gap:8px;overflow-x:auto;padding:2px 0 12px;scrollbar-width:none">
     <a href="#period-1" style="flex-shrink:0;display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;padding:9px 14px;border-radius:99px;background:#e9f0fa;color:#1a3a6e;border:1px solid #e9f0fa">幼少期 ✓</a>
     <a href="#period-2" style="flex-shrink:0;display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;padding:9px 14px;border-radius:99px;background:#e9f0fa;color:#1a3a6e;border:1px solid #e9f0fa">小学校 ✓</a>
@@ -608,12 +561,15 @@
     <a href="#period-6" style="flex-shrink:0;display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:9px 14px;border-radius:99px;background:#ffffff;color:#8a94a6;border:1px solid #e6eaf1">総括</a>
   </nav>
 
-  <div id="qlist-entry" style="display:flex;flex-direction:column;gap:14px"></div>
+  <!-- ===== 質問カード（jsがQUESTIONSから生成） ===== -->
+  <div id="qlist" style="display:flex;flex-direction:column;gap:14px"></div>
 
+  <!-- ===== 底部の完了アクション ===== -->
   <section aria-label="記入の完了" style="margin-top:20px;background:linear-gradient(135deg,#16305e 0%,#24509a 55%,#3a7cc9 100%);border-radius:18px;padding:26px 22px;color:#ffffff;box-shadow:0 14px 32px -14px rgba(26,58,110,.55);text-align:center">
     <div style="font-size:18px;font-weight:900">記入おつかれさま！</div>
     <div style="margin-top:14px;font-size:13px;color:#c7d8ef">全20問中 <b id="doneCount" style="color:#ffffff;font-weight:900;font-size:16px">12</b>問回答済み</div>
     <div style="margin:10px auto 0;max-width:420px;height:8px;border-radius:4px;background:rgba(255,255,255,.2);overflow:hidden"><div id="doneBar" style="height:100%;width:60%;background:linear-gradient(90deg,#7db8ee,#bfe0ff);border-radius:4px;transition:width .4s ease"></div></div>
+    <!-- 未完了時の注意（提出自体は可能） -->
     <div id="remainNote" style="display:inline-flex;align-items:center;gap:6px;margin-top:14px;font-size:12px;font-weight:700;color:#ffd9a8;background:rgba(255,255,255,.12);padding:6px 14px;border-radius:99px">あと8問あります（このまま提出もできます）</div>
     <p style="margin:14px 0 0;font-size:13px;color:#c7d8ef;line-height:1.7">記入が完了したら、太田さんに面談準備のお知らせが届きます</p>
     <button id="submitBtn" type="button" style="margin-top:16px;display:inline-flex;align-items:center;gap:8px;background:#ffffff;color:#1a3a6e;font-weight:700;font-size:14px;padding:14px 26px;border-radius:10px;border:none;cursor:pointer">
@@ -623,12 +579,13 @@
     <p style="margin:12px 0 0;font-size:11px;color:#9cc4ef">※ 完了後も回答は編集できます</p>
   </section>
 
+  <!-- ===== 前後の時期ナビ ===== -->
   <nav aria-label="前後の時期へ移動" style="margin-top:16px;display:flex;justify-content:space-between;gap:10px">
-    <a href="#student-home" style="display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#1a3a6e;background:#ffffff;border:1px solid #e6eaf1;border-radius:10px;padding:12px 18px">
+    <a href="#period-2" style="display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#1a3a6e;background:#ffffff;border:1px solid #e6eaf1;border-radius:10px;padding:12px 18px">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"></path></svg>
       小学校時代へ
     </a>
-    <a href="#student-home" style="display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#1a3a6e;background:#ffffff;border:1px solid #e6eaf1;border-radius:10px;padding:12px 18px">
+    <a href="#period-4" style="display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#1a3a6e;background:#ffffff;border:1px solid #e6eaf1;border-radius:10px;padding:12px 18px">
       高校時代へ
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
     </a>
@@ -636,20 +593,130 @@
 
 </main>
 
-</section>
-<!-- ===== /VIEW student-entry ===== -->
 
+</div>
 
-<!-- ============================================================ -->
-<!-- ===== VIEW: 面談者・学生詳細 (#advisor-student) ============ -->
-<!-- ============================================================ -->
-<section id="view-advisor-student" class="view">
+<!-- ================= 学生: 志望企業 ================= -->
+<div id="scr-student-companies" class="screen">
+<header style="position:sticky;top:0;z-index:10;background:#ffffff;border-bottom:1px solid #e6eaf1">
+  <div style="max-width:780px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+    <div style="display:flex;align-items:center;gap:8px">
+      <a href="#student-home" aria-label="ホームへ戻る" style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:10px">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1a3a6e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"></path></svg>
+      </a>
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAAoCAYAAABXadAKAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAHjxJREFUeNrtfXl4XWW1/rvWt8+QtGlpaRHT5py0jZ1OUoXoo1fxZ7zXq5eLioinyHgRuJWptElaFBw4TCI2Q0ulQr0iKMO1QQS96kUGI04otzzYntMBAyQnaRnaAp1yhr2/tX5/7HOSkw5pWqQ45Hue/dD27P3tb3jXWu8avg1jtI22v6PGo0sw2kYBPdpG298WoJUA0Mi7Odz7R9toOyqAVkI8bgBSAArEzfBATbB/jfT+0TbajhqgC8Ds6LCVlQvKEYsHgQ7rA/VAIE0wkBAgIZWVC8rr6xcEhr9/tI22owZoJSAh06cvGB+JNS0OTBj3vShHvzs11ngW0ODsD1IfzBOmLxhfVdvYHJg47nvbs+PujMYazyrcNwrq0fZWAVoJIK2pWRjyyitWkgm2g/h0wJzF7NxTVXvClQUQUyn4p06Nl1WMGX8rc7hFQaeDzVkg557qui8uLun/KIA6wT7VSRyhg6tU8jwN0/dRFFClQTo3qhgOD9Dx+QwA+WDgkyA+S7wsRLKueJkcVEEwl0+tXTTPpxdxA1xLAMDjI6dAcbZ4GVHJueJlcqoCkfzVU2ZfNhM+pz4KUZSE+FQnIUf2PGnJ8zpM33r0toW0SOeO7nv/HgDdEfeX0JhZUDVQtQAFQBRU8QTQiQwTAQDE40CiuOYUAwBV0YH71VVVmUQBU3NURt+QcN4+57LotFmLZkXqLpleXZ0IH24XM+YtOa5y1iWzpsy+bOb0+i+MLwEzV9Y2VVXOumRWVe3CGUfS95G2ypkLJkVmXjD9+NkXV0+adUHFkUoF/gG1O8PHM9TabQABBAagUCgRM4EyUHnNv6ujBNDyEhEBUPaBDQUZIqKMsfrimztsn15MejF9XMCUr5RA6JeEcfe4Y/bOLv19BBsOV6k5EKh42DjhR71c7pPFH6vf9fo4R+mbTnDs40xla+zYnbX+L3HzJk2qAL4GJxA8ZjEFJz0cDoz7cXlg4smHMafS9SlEnhL/ULkGRscGBYBsxj6owJNsQgRVAaDEAajSg+nUM3/w8dwxYNYl1/8/qvKUccIEVQtWZQ5Cie7t2fDSuoIAyJs5+KDjOAREyQTeriqzAsb6WjSeGoFm0uJ/jid2okROFUQnFH/1XGJVO4MpWAnFO0i50PebvCP1u0mBCJlQjYLrGHTsyOcEFH2cQSFJCP6BWjH0xq+8sOJl0uyFqt7TxI4hNkYl/1OB1wx0eoNS79/f9+xtW6CB81VlA7FjmByj4v4wEAo0F3gn403mf2RCIkBWbR5Qm7WW7BHoxYxIDip5KJNb/FfmkAKaE8kB0H42xjsqO1JRoVDJis1ANecqND/yh/3Qa3TekmnR2qXfidQu+XmktvlfB4H+DwFoAEgokOB0auUGwPyW2AGIFKBf96XaX21oSDhDJT2hACidummDqv0TsQOAFMyPPL/25p3Y7/43p6lYIoBBDAKxwhz2ppHCEBggA+jQRJMSMRFDoUZVjhogiMBEDICM6ojLE6iwL1CR64gDFzA5HyM4t1TVLp1RcDT/mugHDY3mFKNJxevIBLA0sSKIxYNEGh5QrMRlANDZgAOBU2OxRBCg0KD5Vt8sT0797XjmROoP9kBD1sIt9NbMRwFADudmrW5IhAGKqFqI5ACS44lyx/j3pN5qLU2D4FUMjeYUo0nF68jWfKjEpraJig50JJBhO508GUJDkECjIaa3DisKJLi7M5GFYqVI/mWAXBV7ezqYPSo+zSEEjvxcRhG8pNXV54cjdZdMiM66fNrU2kXzptUumheZ2Ti9cmbzpANGleJxcyjN/bfkAdNgEdQRaxp6Ewup6K0v0vJpXjrVer/jyYcU9IF06ukvY+1qF4MZ3Ldo73xtXD374upobfOnq2qXLNOKST+ClP9GHedJVn7CCv1aHP19IIDf6ti9P4vEmk8CAJ/CAujwBQHxNeaNAboTJTwnbtCQMECCt20D6/B9+CYmMZD12v/3xLC/+/fE48bfjEIRVCJWYAneCMEzINmDfcQ7/jLCnBjge4N9A/QXK9Rif5ixDTHjv6uwB8PyYaUXNq/Y3Jtqfcp36IeAeXDNR3IdsTNZ5Mf+u6PzLp8WqW1eroGx/6vQHzLxEoD/DURzAT5OgfFKNI6Jj1PoTDLhD6vaU338Jbypcxe9tyrW+Fk0NDjomG8HsHU4gGYt0I/OhDdoKjps8e+pVCIPIDfMvvkcKTGQ9dr/98RwvxciJR0dFgAakHCAuPHvBygnUoibDyNQoKKJA0B+ERVQWBQI1Byh4qICoIt8j2KxeHAQPMVCrTfqiPmASqUSef9dhT1AQgqa6gCLvx/10wOu+UiuwtwOU8p5gB/H17A/onADm9AiVZ2lYsV6WWu9rFWbF1UrUBGoiKoVVS8vNgNiZ17lzAWTCnOayBxaEd327h9HY00fHsDWPnmBYRablKAKgCJ1l0w4vuaqyVNqFk6N1i6eUzW38YOR2JJPRGJLzyPVmSoWAA1Muv75CQwA1XXNs6N1S5qitUu+FI0tPX3AdBQ2ecrsppnVdUsbo7VLvlQdaz5z6tTGsqGLkhDE42Zq7ZLTIrGldz0X2/loVWzKo5FY87cjseaT2IioIl/A7eCmxWJaopW0KrboPdG6pW2R2uaHX8mUPxapbVpTVbf0fH8xOEOHs18dJWAGEJ3bdEIktvTmqljzT3djymNVtU0/r4otWRmZUwyX+WHOw5SVojeqUGQqKxeUT61r/FC0rvnsqljzmVPmLHxfTc3CcUWhHNSi/nuic5tOiNYuXRKtbfpStHbJKSXaElW1je+urlv6xWhtc7N/XVm4Sv+8dEl1rLkxWtt8ddXc5osrKxeUDRHi4VohwlVZuaA8Om/xifXPP8oFxREQyXti8xZQIiJDRAZ+OGfopeRABVDUMpVVAoBRPKNq0+SETlaiB6piTa2VM5sn+cI9SEH4YMpH1VMlPrUqtvQe0jE/CpbZn5tQsFMUvwHkUVHvQYW9U4ETVF0tnevOnSEGAE/kRMDczE75DcpYMDW309eO9VsNADgGdQq+iZ3yG8CBi71w31ifIcQNkJDqdy0+pioV+TYDD4BwHnPwQ8aUNxgnfBGgP1Oq+AJBg4D48ldsqdSAiY3GllxOMI9B0QiYfzVO+QeZw3EGfzcyt+ouVpmiakeuhBpiRT9YI7XNC5XpcSJcyeyczKb8JObgx5j5cmX9WbRu6fWDZbZ6mAcmCKpWVfU055iKh8jq4wDfzcT3MvEv86Hgg9HaJaeVUJ0B38ISfwBklrEZcwPA5xTqb9jfcGoABW8CqEXBLQptUWgLYFpAaAGhRYFlSqaNOHijMYGyrVtX92MkHLwh4aAz4VVXnx8OTJp4m0pw8VqfvwOi5VByiIgLXSn8EI5A1RYma1XVAqqqVkBSyQazAKBn4/IXVd0/i81BxRvHFGhyAvRAZG5jDJhfzHvgIByE/BoNpXpmcybIfIhA9WScGcyhiWzCQWNCzBwgIqKDRTcYnFf1suJlAPHy4W2eTysqKv2AlKqn4uaszUDU5pzQOF/jdPgaVj1uNU7wcyquQi1U3ZfV5v9gvcwLRE4FO8ErVNyYWhcAM8H64yhYiKpY0/lKWKnQClUPEC8rkl9rvVxSJQ8ygbNF859QeLbEwAzbYtvgJy9qmy4g0C1QPUbVQsV7TST/FGy+W8UDQR2Av1xd2/+FIyYbKiDQaeyEPsIcZBW7U9TuZRMOkwl9WFUeiMaavjJU2AAGcqpuXmwWqq4LXKMlukoA8WsbVIpJYYi6EJ8GiEjOAxQiuWu713+9fWSC7oO5pubscTJ20t3MoXMJumfgtQSHCtZHfTeDQMxEhskEDZmQMU7YGKfMsBM2ADGRAzKB2YNcyWwqWFOxkvGI+YNkgvdH65b8U9ES8kGpLwgK8URy/dbmdlubfUVtbrOq/b2KfVjE+29VewuAjUSGDyi86msagCAK9rzd+6GGiEAg8BANmZBIbWNcYc6zXkZAhqC4G6L/Il720+Tl/0XFu1rFyxbj4KolGnDtanfanMuiRPQVqICgAOFpGP6EmD2nipM/WQifFnGfIxgDHXGwF6lUIj9tTnMUZK5U1eKjj5DwR/LZHae4hP9H4OuV0K/iwkIap9Y11vlCf3h1IEVTIDbzjJI3X6DvFosTofYisZkukIESXxeJNf8HAK3p22GKGp6K7oOCChpaAMAqP6o2fxkInyfI5wG5jEjPAXADsckTkxoTdqByXzrZdn0JldFhOXNnwqusXFDuht9+J4FPt+7eIXeIki0CmU1IiIwLaAYqLxN0HREeU7U/UNjlqrqYQB3EAUAQra4+PwwAhrQPUBeAIcCIzeaIzGwRe3lhd2g/QA8UAZBhIv4BmE9Whz8Kcj/gueakjPZ/VHba044L7z4vnWxZpEAhU6h68H05dDhFoFAbLoAyblTpLEAdIsMgetB7fc/n0xvaU72bv7m1Z/M3X0hvaLsJTDcQm6K8q2Iwm+c5oY8TeLoPONpiXPlcen3Lo31/um3LlnUr+/qS7T8ioksA2gFw4ODD379Z1o+qyDtACiLeKDbf3LNx2dPHhvbs3Jps6+3JpW4k0E/gw2oyq/PPBf0+8peogsgJAPJbDbqnZHXXEwx6f8Dwif3a/wMYc5qqu5E4AGJaVDXr8squrpW5A3d2jRZpT1+yZV1PqnVVen3r6nSqfXVvqn0V7a74IZEzS4EyooBRtb8P5PKLANhDZ30HakfImTi+DWROE8nlfYtHA7FkJtrlU2bazGoXqnKcYD4qlD/J87L/nCU9tULT56XXtzSmk8tWgLw1BTM/ZU+IA/6SuNsAZPxMF1mAQ2LzWSI8dHAOTaSA+lxdkexd3/rElnVtT/alVnVtfbZ1+7bUqj19fe0ZnxutMQCCg8L7xuL21uv3qULN8dVEZnpBHPaq1W9v3bq6v6bmlhCQ4EI0AVbt9wHaxCYAQAXwKXosFg8S+D3+QjoA8z0vbF6xrpDCZ3/cCU4nWx9R0kfZX69DAGwwra7w3gliVrFQlbHGhK+O1i790W5E10RizQ9FQ7E7oTpD1XN9LSm1AExx40egmxVsoNA9YF7k9JuKsI77A3HgLmXnvjIqe1yt3Qp2rlKbg4qeoAHnfSPS+UUHsaEQMWpocLyxO1cTUbwQMHrBql7S1bVyW0OBRgzfp18fH527qAnQz4vNqAJMRFD1xg2un7wOYhCZl5zsj+/o3dDyUDrV+pu+1KquLZtu3fHyupa9qVRHvqbmllB19flhsRpU8aDKE8uDoUIwwbwKUJaUQFBlEwKAFelk+xp/Xh0yFNANwGAYTAnkS1h9/e2BoXl2Pz5ZX/8ov5FYvdF9HSXfJ9QQjiVgXKGe4UVovhcAurp+XQgXrnEBIJuT10H0LPl1GOoU6i1ee22CQ0qTlXweCkUSADo7UwVNNd8Wq9cYWD8ESIdoNTW3hIgCkwulsy5xoIoDYz7LJvwp45SdapzyT7JT/lk25e8mCgaMKQOIIzU1JzuDdO6Q2ll9IaNn9mTyf5ZAcBE7ZVGx2by1GY9N+D3MvMAY71cAutiEQTCzh1K9YYQFCUVnSoEOW7X9xC8w+FyVPIj5NVa6dEuq7U9oSDidhwSz77xHYgvnKgcaoQIFLBFIVaCQ42tqTg75Vs3drjangEYzgZNPmDbvyllVsUUfi8y54tyqWHNjpLbpa1WxRXflQt0PydhJj7ETug5qAfLG5B3HXzs2WYW6CgWbsoBK/n7eOzZRIlg6BNDV3dUOQccO0gA/9b32Ey/uk2dPKEBaUVGpNAACIlGUHZxSHGhtSQfKRkqiAARWn/juC7J9TfarQ6hOcfU5Oka1lEMo037P+6E9KCADgxhBJMKb+ioNApMN1K4Xb+9/ezbzgNjsD8VmfujZ/ges5H/Eyt+zNvswgZ7qmvpeW8LAihT5AO9rGKD0RLRzfDhTBujbVFxARUnV851OrhQbJhC/DiKQIjRocQ9F8NYw0GGrYld8lkBfVbUKGBGVq7tTy/63yIkPLXn+GroiewHaQhwEEfmuhb+mx2l4znGFXewD9BVVO43J3GetfZwpeB+Z0GomaiNyrmIOnecXVNH7ITJDoVBBKJQ1jo8hJw9AjVMOlfxPrM1f3N2dyA5GkgYPyQIA9oQ4oOBJehh8UgFSVRAIJHI8AIRCx+o+wAWD4HkTCFDyIwWAVS0NAeecUL8FAGLeoYrdBYfueMPOVF877ggAoPr6zzsAUIaycVDM8D11UIBYAWD8rj4L1W2kChADpLN9S7N1oKKrobMwd6U5h5M36O5MZFVlO1TBHGBVeawn2XJmKJs7q2dO9xnTJo39bG+y5fTeZHdcbOYW3vPKp3qS3/gyOhN2cMmKQB5SAef/e2fCIzLbfDpjZ+e9kKeEXxA7IBMKsRMOAwoV7xHjueOgMkPFhUJfGdAbNMwGxtcYYL6dMq/pfcShVkCDzEEC6JbeZOttaEg4qN9qEI8b/97hhNyPLLy48dYe8TIXieafZC4LgEAqHpgD4zx4VQBgHLMDxM+BAwBRNaCVIu4EETcs1hOxORGb80RynticVVi3oOiUOO/PR/JlBBonNnM/B/S8LZtu3VG0EvtwaJ8HVQQqykkkChVgpHGsgd1QgDlaX78gkJpcWFhGhgguVAA2VRr2jgVIU6mUv7mGa1RRUdCQu529th8Apde3v6Bqny/ktytAzjk+5ViZA6DF2KYJTzgNKrViXYCIXfghz1SqI6/AUwrAT/roZyJ1jdP953wr09mZ8KpmNb6bgI+pjEAZkS3R+FivquoLkvn3yhlNVV1dK3Po6LBFM11VW/UZOKFH7JiJd0RnL/6nkpUqhjk1Frt07FCHa37h9I/3pLUZEDkzjHEuSq9vuV3EvYpAz6jq/4l1L0mn2n/isS4lDkxQcXeLlacPxXMbGhIGHfNtpK5xuiN8O1QroQIV9650qqURgJ8VXrvaRUeH9RM3h8oUFpzNTd9cn+f+U1Xd25gcMAcB1QkKngEAzh6bIfAGAgMqeVUrvt8jCpJinNwB4ID88I0v4pxxrV+nTgRRdW/MGXN+9zPLX/fzFR1DauALgC4E5BXvUJXqw0o0DNA2AZOZ9lq27O1Fc6VwN6rqq6IWKm4th5yrInVfnADENPLO5pMIdJGqpUKIcFN3951ZxBIBAMqsawDyRKwIyfyq2iWrps1pjtbXLwhMmX3VsZE5zYsAudY3z+oHBcAl8db8w4C+QMRQse+A0venzGt6X03NwtDb5i0ZMzV2xb+Rw99W4DiFeIczX/LwC4Ce9ycuM50w/is6Z/GJNTULQ7HYpWMjsaXnMWgFxE5wAmPPVMeciYE0OGl17NLjI7Gmu3ZT+HfR2OKL9jXh/d7OTiLzC+YAQOaqSO3ihRXS3SZu5pR8Nvvvugt3VcUaryeViwAGiB7cUrfljwcMCzLgU8Q1prMz4U2OXToWQqsAmqfiiir2KPS5aKz5oql1jZdXxRovLV6R2uZFU2JN7xxqVQ7Cy+NrzMvrbnslnWy9BKCzFLKWTVkQSh8sKiMleaqQNymm7NlXnEXlWYiDqloQLLEBgQKBcMACQCjrrU+nln/j5XUte4EEF0si9gd0odiH1HkvyAThn5IQGkF8lgABFKSSF9iZOZgZPkVNBHuTK5+D4m7moB9wBhbA5n5bFXv9CfXkQVV5B5sgmPBnJvoBAGDuXAsAPevb7wX0XuOUMUQcUnuxx/aJV7Lljxnu/w0Yy4nMBChyhTUdnFz9gkBvcuVzBLrR96wZUH0/W/qfbMj8KmjdXxE5D5AJvEvVCgHWt9ZDTTUBFj4bH9DhsVgimH62/Xki3ETMloig0I8K4ZFsyHl8N4K/BtnbVORtZByIzT7mQZf55n4u+ZS+/FLm4HmAqRNFq5/tGnS0tm++Y7eo9xVVeZ45NB7Kt+zC1CcoGFwaCDlf5fH4HRF/mUxZCOI+47nejejosLFYzAwAg2D95ImKf/reT5OXUfmNROZjYvN5P8miASLnKhCvMuq0MpnlTE47kWlnDiwPkPMhHyPXDi/xHfNtUaDSyZY17NiPWLs3odCAn6IGNC9PA7qT2DEFl8fzD2XDA8ECBGLDbIKGOBgE4BJorbedcgWhyPuCpQc9WuZXUyUSMjl26VglOYedMIgCQWPCDDq4kzdofanCmHKAOOg4Y8sNcKZv9n0fjffuuEnVriQywhxw2CmbY8yYD7AJHcscZAKeFde9tHt96yYgbvyF8Xml9TJNKu73iR0QO2Q4HDHOmA9yoGK2Ap5adw0RbXMCFQBwDDP53rCfiaSeZMt3WKWJQLuJHTA7xzpmzHuNM7becKhMrfswk3nKOOUhNmEACA04sZIjAOPZKQNBJ7L1+y7SqZ5ky3cAXgQyO5gcsAlPdEz5+9kpfxdRoAxsAOBn7O29cGuyrdfXKBsKGVJxQAQqCht5JYLkH1/rS7X/Eeqeq+L9nsjAcca8l83YxcapuJxN+bt82OYfsdaet3Xzis1AglNzC1SOKEwUKDMmDIAqinXQkVjztcaErwAI7ISCzCGHTThEZMoACgAUhE9ygwQKghwoNDhyO93hm/Z43HQ/s/z1dLLt2lDOLnIDmazPAPZ2MztPkgmByAmwCTnshA2bkMMUMkQOEZlXFHgKsLeLdeN73R2X9vW1ZzCQeicdLho14A6XS7BCSe+3dtdNQvZaa/fexC4e8aXzmgN20NkJAegu6+1aJrDXWG/PTWCsraxfUF6shOruvjObTi5bBPXOgMp3xeYeE8k+oWp/rOpeS/ncJ9Mb2x/1QVw0If6zWzbdumPapLEXEOk5Cr1b1f2lerlO9bL3ghHPUO5CIpPw7N4WkCQCxL0FHmgLji51p1rbReUUtbJS1f5CJPeEeLmHVHJLsbv/TIFzjdjczZ635+sK/u2AnO5EBkRt1t29DNBEkG233/c1tmh+e9bffKu12Y+r2puh3k9Fsk+Il39c1X5fxbswkMmc+cLGW3v2TU5Y4Fsiue+p6h9ZebF/9K1IDQadrZ5k2++yvPtTqnaBtf13i7vnl+LteUwle4eIntvvmtP7NrWvH/DyOwqRG8WT1uaut96uZaR0HwCdGrtwIpgzns18zSJ/rUjuBpH89SK561Xy16m616m614nmr1d1r1O414q39+vE9jf+kBIjjRQUqiN957ura+WubalVewDQ1mdX7xAv32xt9myFbRab+5qo1yKSv1E03wySMwB7Wkb7P5lOtl3cu6H9oe2b79iN0sjFIVrxQ4vo2bj8pd7k8ht7k7dc3Zdcnkgn267u2dz2y0FvfN/ghr/wvanW+9KpFVf2pVZcl062XZ1e33b71rWr+0u1DQBNp5bf35Ps+U9rs2fks/nP7MlsPTedbEu8sHnF5n091dJnOzsTXs/61nvSwV0XuPnd83O53Pyx6Plc7/rWB7elVu3pSbZ8pzfZtjS9vv3rXeu+0VcafCmMkXs3tP86vaH1CtHXzszxnngG/ef0JNta0ulvvdabuvnhdKrti32pFVf1pdr/WHx7X197pje5/FvpVPuVPcnWrz2XbOsdXAvSYoJiy8aVT6ZTbV80/bvOzmfzn/HcXWdMDu26sHfD8ju6ulbuGhoC8xMrW5NtvRXa+5/57LaPd29o+e6gs1i6ab5Qv7zutlfSqbZvp7X3Qs/dM9/a3Bk9c9IL+ja03b198zd2Fwu5SvpHb6r1qd5U21fTqRVXpje0dQBAX2rXzvT6ZV/vTbZ+qS+5PNGbWvGV3tTyr/amln81nWq/pngN/D25PJFOtV/Vva7tycMB1D4RkNJEkgLQ9Ib2VF+q/d7e1PK23g0rvtSbbFvam1r+5d7U8rZ0sn1NT7Ltd9tSq14CEjySEyoH1dCDTkvpNRJPqfSg44EKwouTihugQ7ZsunXHS10rt73adc+uwWc67HAeNBA3WLva3frs6u0vda3clkp15Avf3KNDfDarpGZWqS/1nVdfXnfbK77GKB3vwZ4fshb7O0IDfSf4+edX73ypa+W2rc+u3u5HU4qbsR/XUyDBqVRH/qWu724bfO+BzGhRIcQNUh35rc+u3r5l0607fA1YKPLvONDalc6puB8ddv+9Gsn1hg8p6H5r2pBwitnawTGtMWhocAoCWrA4A3XsRwRo7JM8GeFnqEoPOh70cKOW0IlSIMmhT4cXP9WFfYDX6Q1q4kONt8P6+3Kgdw/3/JC1GIY3JnR/wRhuM4pCPpAQ0OE13YHmP9znz0rnVDoGOsAeH+r6Sx/bSohvseYXxl8c03yLzk6vQFeOuIbiaJ8p1DdwqveNfu/tjbx7BH0f9vfo9DA37i/xvbu/xkPMf9Exjf4vKUbb31UbBfRoGwX0aBttf63t/wNTOCFBcXXiDgAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAxOC0xMC0yMlQxNzo1OToxOSswOTowMLzFnUwAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMTgtMTAtMjJUMTc6NTk6MTkrMDk6MDDNmCXwAAAAAElFTkSuQmCC" alt="Huddle.biz" style="height:24px;width:auto;display:block">
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="text-align:right">
+        <div style="font-size:13px;font-weight:700;color:#1a3a6e;line-height:1.2">山田 太郎</div>
+        <div style="font-size:11px;color:#8a94a6;line-height:1.2">〇〇大学・No. S12345678</div>
+      </div>
+      <div aria-hidden="true" style="width:36px;height:36px;border-radius:50%;background:#1a3a6e;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0">山</div>
+    </div>
+  </div>
+</header>
+<main style="max-width:780px;margin:0 auto;padding:20px 16px 90px;display:flex;flex-direction:column;gap:18px">
+  <div style="display:flex;align-items:center;gap:8px">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#4a90d9" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="3"></circle></svg>
+    <h1 style="margin:0;font-size:18px;font-weight:900;color:#1a3a6e">志望企業リスト</h1>
+  </div>
+  <section aria-label="進行中の企業">
+    <div style="display:flex;align-items:center;gap:10px">
+      <h2 style="margin:0;font-size:13px;font-weight:700;color:#5a6577">進行中</h2>
+      <span style="font-size:11px;font-weight:700;color:#2f6fb5;background:#e3f0fc;padding:2px 10px;border-radius:99px">3社</span>
+      <span style="flex:1;height:1px;background:#e6eaf1"></span>
+    </div>
+    <div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">
+      
+      <details style="background:#ffffff;border:1px solid #e6eaf1;border-radius:12px">
+        <summary style="display:flex;align-items:center;gap:12px;padding:15px 16px">
+          <span style="flex:1;font-size:14px;font-weight:700;color:#2b3442">福岡銀行</span>
+          <span style="display:inline-flex;font-size:11px;font-weight:700;color:#ffffff;background:#1a3a6e;padding:3px 10px;border-radius:99px;white-space:nowrap">最終選考</span>
+          <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c4cddb" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transition:transform .2s;flex-shrink:0"><path d="M6 9l6 6 6-6"></path></svg>
+        </summary>
+        <div style="padding:0 16px 16px;border-top:1px solid #eef1f6">
+          <div style="margin-top:12px;font-size:12px;color:#5a6577;display:flex;flex-direction:column;gap:6px">
+            <div>状態: <b style="color:#1a3a6e">最終選考</b></div>
+            <div>次回選考日: <b style="color:#1a3a6e">8/15（金）最終面接</b></div>
+            <div style="background:#f7f8fb;border-radius:8px;padding:10px 12px;line-height:1.7">逆質問を3つ準備する。地域貢献の軸を自分の言葉で話せるように。</div>
+          </div>
+        </div>
+      </details>
+      
+      <details style="background:#ffffff;border:1px solid #e6eaf1;border-radius:12px">
+        <summary style="display:flex;align-items:center;gap:12px;padding:15px 16px">
+          <span style="flex:1;font-size:14px;font-weight:700;color:#2b3442">西日本鉄道</span>
+          <span style="display:inline-flex;font-size:11px;font-weight:700;color:#2f6fb5;background:#e3f0fc;padding:3px 10px;border-radius:99px;white-space:nowrap">一次通過</span>
+          <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c4cddb" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transition:transform .2s;flex-shrink:0"><path d="M6 9l6 6 6-6"></path></svg>
+        </summary>
+        <div style="padding:0 16px 16px;border-top:1px solid #eef1f6">
+          <div style="margin-top:12px;font-size:12px;color:#5a6577;display:flex;flex-direction:column;gap:6px">
+            <div>状態: <b style="color:#1a3a6e">一次通過</b></div>
+            <div>次回選考日: <b style="color:#1a3a6e">8/8（土）二次面接</b></div>
+            <div style="background:#f7f8fb;border-radius:8px;padding:10px 12px;line-height:1.7">一次のフィードバック: 結論から話せていた。二次は深掘りに備える。</div>
+          </div>
+        </div>
+      </details>
+      
+      <details style="background:#ffffff;border:1px solid #e6eaf1;border-radius:12px">
+        <summary style="display:flex;align-items:center;gap:12px;padding:15px 16px">
+          <span style="flex:1;font-size:14px;font-weight:700;color:#2b3442">九州電力</span>
+          <span style="display:inline-flex;font-size:11px;font-weight:700;color:#2f6fb5;background:#e3f0fc;padding:3px 10px;border-radius:99px;white-space:nowrap">ES提出済</span>
+          <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c4cddb" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transition:transform .2s;flex-shrink:0"><path d="M6 9l6 6 6-6"></path></svg>
+        </summary>
+        <div style="padding:0 16px 16px;border-top:1px solid #eef1f6">
+          <div style="margin-top:12px;font-size:12px;color:#5a6577;display:flex;flex-direction:column;gap:6px">
+            <div>状態: <b style="color:#1a3a6e">ES提出済</b></div>
+            <div>次回選考日: <b style="color:#1a3a6e">結果待ち（8月上旬）</b></div>
+            
+          </div>
+        </div>
+      </details>
+    </div>
+  </section>
+  <section aria-label="内定した企業">
+    <div style="display:flex;align-items:center;gap:10px">
+      <h2 style="margin:0;font-size:13px;font-weight:700;color:#5a6577">内定</h2>
+      <span style="font-size:11px;font-weight:700;color:#ffffff;background:#2f6fb5;padding:2px 10px;border-radius:99px">1社</span>
+      <span style="flex:1;height:1px;background:#e6eaf1"></span>
+    </div>
+    <div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">
+      
+      <details style="background:#ffffff;border:1px solid #e6eaf1;border-radius:12px">
+        <summary style="display:flex;align-items:center;gap:12px;padding:15px 16px">
+          <span style="flex:1;font-size:14px;font-weight:700;color:#2b3442">TOTO</span>
+          <span style="display:inline-flex;font-size:11px;font-weight:700;color:#ffffff;background:#2f6fb5;padding:3px 10px;border-radius:99px;white-space:nowrap">内定 🎉</span>
+          <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c4cddb" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transition:transform .2s;flex-shrink:0"><path d="M6 9l6 6 6-6"></path></svg>
+        </summary>
+        <div style="padding:0 16px 16px;border-top:1px solid #eef1f6">
+          <div style="margin-top:12px;font-size:12px;color:#5a6577;display:flex;flex-direction:column;gap:6px">
+            <div>状態: <b style="color:#1a3a6e">内定</b></div>
+            
+            <div style="background:#f7f8fb;border-radius:8px;padding:10px 12px;line-height:1.7">第一志望群の結果が出るまで返答保留（〜8月末）。</div>
+          </div>
+        </div>
+      </details>
+    </div>
+  </section>
+  <section aria-label="辞退・不合格の企業">
+    <div style="display:flex;align-items:center;gap:10px">
+      <h2 style="margin:0;font-size:13px;font-weight:700;color:#8a94a6">辞退・不合格</h2>
+      <span style="font-size:11px;font-weight:700;color:#a3adbd;background:#f1f3f8;padding:2px 10px;border-radius:99px">0社</span>
+      <span style="flex:1;height:1px;background:#e6eaf1"></span>
+    </div>
+    <div style="margin-top:10px;border:1.5px dashed #e0e6ef;border-radius:12px;padding:18px;text-align:center;font-size:12px;color:#a3adbd">（なし）</div>
+  </section>
+  <button type="button" style="font-size:13px;font-weight:700;color:#1a3a6e;background:#ffffff;border:1.5px dashed #b9c5d8;border-radius:12px;padding:14px 20px;width:100%">+ 志望企業を追加</button>
+</main></div>
 
-<div class="adv-layout">
+<!-- ================= 面談者: 学生詳細 ================= -->
+<div id="scr-advisor-student" class="screen adv-screen">
+<div class="layout">
 
-<aside class="adv-sidebar" aria-label="学生の検索と一覧">
+<!-- ===== 左サイドバー: 検索・フィルタ + 学生リスト ===== -->
+<aside class="sidebar" aria-label="学生の検索と一覧">
   <div style="padding:16px 14px;border-bottom:1px solid #e6eaf1">
-    <div style="font-size:15px;font-weight:900;color:#1a3a6e;margin-bottom:12px">Huddle.biz <span style="font-size:10px;font-weight:700;color:#8a94a6;background:#f1f3f8;padding:2px 8px;border-radius:99px;vertical-align:2px">面談者</span></div>
+    <div style="font-size:15px;font-weight:900;color:#1a3a6e;margin-bottom:12px">Huddle.biz <span style="font-size:10px;font-weight:700;color:#8a94a6;background:#f1f3f8;padding:2px 8px;border-radius:99px;vertical-align:2px">面談者</span></div><div role="tablist" aria-label="ナビ切替" style="display:flex;gap:2px;background:#f1f3f8;border-radius:10px;padding:3px;margin-bottom:12px"><span style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:5px;font-size:12px;font-weight:700;padding:8px 4px;border-radius:8px;background:#ffffff;color:#1a3a6e;box-shadow:0 1px 4px rgba(26,58,110,.15)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"></path></svg>学生一覧</span><a href="#advisor-companies" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:5px;font-size:12px;font-weight:500;padding:8px 4px;border-radius:8px;color:#8a94a6"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"></rect><path d="M9 22v-4h6v4M8 6h.01M16 6h.01M12 6h.01M8 10h.01M16 10h.01M12 10h.01M8 14h.01M16 14h.01M12 14h.01"></path></svg>会社一覧</a></div>
     <input class="search" type="search" placeholder="学生名で検索" aria-label="学生名で検索" style="width:100%;box-sizing:border-box;border:1.5px solid #d5dce8;border-radius:10px;padding:10px 12px;font-size:13px;background:#fdfdfe">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
       <select aria-label="大学フィルタ" style="border:1.5px solid #d5dce8;border-radius:10px;padding:8px 8px;font-size:12px;color:#5a6577;background:#fdfdfe"><option>全大学</option><option>福岡大学</option><option>西南学院大学</option><option>九州大学</option></select>
@@ -704,8 +771,10 @@
   </nav>
 </aside>
 
+<!-- ===== 右メイン ===== -->
 <main style="min-width:0;padding:20px 24px 60px;max-width:1100px">
 
+  <!-- 1. 学生プロフィールヘッダー -->
   <section aria-label="学生プロフィール" style="background:#ffffff;border:1px solid #e6eaf1;border-radius:16px;padding:20px 22px;box-shadow:0 6px 18px -12px rgba(26,58,110,.25);display:flex;gap:16px;flex-wrap:wrap;align-items:center">
     <div aria-hidden="true" style="width:56px;height:56px;border-radius:50%;background:#1a3a6e;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:22px;flex-shrink:0">村</div>
     <div style="flex:1;min-width:220px">
@@ -718,10 +787,11 @@
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <button type="button" style="font-size:12px;font-weight:700;color:#1a3a6e;background:#ffffff;border:1px solid #d5dce8;border-radius:10px;padding:10px 14px">面談履歴を見る</button>
-      <button type="button" id="advGotoStudent" style="font-size:12px;font-weight:700;color:#ffffff;background:#1a3a6e;border:none;border-radius:10px;padding:10px 14px">学生画面を確認</button>
+      <button type="button" style="font-size:12px;font-weight:700;color:#ffffff;background:#1a3a6e;border:none;border-radius:10px;padding:10px 14px">学生画面を確認</button>
     </div>
   </section>
 
+  <!-- 2. 4フェーズ進捗 -->
   <section aria-label="フェーズ進捗" style="margin-top:14px;background:#ffffff;border:1px solid #e6eaf1;border-radius:16px;padding:18px 22px;box-shadow:0 6px 18px -12px rgba(26,58,110,.25)">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
       <span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#2f6fb5;background:#e3f0fc;padding:4px 12px;border-radius:99px">現在: フェーズ1 自己分析ターン（3/6 完了）</span>
@@ -738,6 +808,7 @@
     </div>
   </section>
 
+  <!-- 3. 時期タブ -->
   <nav aria-label="時期タブ" style="margin-top:16px;display:flex;gap:8px;overflow-x:auto;padding-bottom:2px">
     <button type="button" class="ptab" data-view="other" style="flex-shrink:0;font-size:12px;font-weight:700;padding:9px 14px;border-radius:99px;background:#e9f0fa;color:#1a3a6e;border:1px solid #e9f0fa">幼少期 ✓</button>
     <button type="button" class="ptab" data-view="other" style="flex-shrink:0;font-size:12px;font-weight:700;padding:9px 14px;border-radius:99px;background:#e9f0fa;color:#1a3a6e;border:1px solid #e9f0fa">小学校 ✓</button>
@@ -750,8 +821,10 @@
     </button>
   </nav>
 
+  <!-- ===== 4-A. 通常時期ビュー（中学校） ===== -->
   <div id="view-normal">
 
+    <!-- 上部アクションバー -->
     <section aria-label="中学校時代の操作" style="margin-top:12px;background:#ffffff;border:1px solid #e6eaf1;border-radius:16px;padding:18px 22px;box-shadow:0 6px 18px -12px rgba(26,58,110,.25)">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap">
         <div>
@@ -769,13 +842,16 @@
       </div>
     </section>
 
+    <!-- フィードバックDocカード（未生成プレースホルダ） -->
     <section aria-label="フィードバック" style="margin-top:12px;border:1.5px dashed #d5dce8;border-radius:14px;padding:16px 20px;display:flex;align-items:center;gap:12px;color:#a3adbd">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c4cddb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path></svg>
       <span style="font-size:13px">中学校時代のフィードバックはまだありません — 面談後にGPTsで生成し、取り込んでください</span>
     </section>
 
-    <div id="qlist-advisor" style="margin-top:14px;display:flex;flex-direction:column;gap:14px"></div>
+    <!-- 質問カード一覧（jsが生成） -->
+    <div id="aqlist" style="margin-top:14px;display:flex;flex-direction:column;gap:14px"></div>
 
+    <!-- 面談メモセクション -->
     <section aria-label="面談メモ" style="margin-top:18px;background:#ffffff;border:1px solid #e6eaf1;border-radius:16px;padding:22px;box-shadow:0 6px 18px -12px rgba(26,58,110,.25)">
       <h2 style="margin:0;display:flex;align-items:center;gap:8px;font-size:15px;font-weight:900;color:#1a3a6e">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4a90d9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg>
@@ -787,11 +863,6 @@
       </div>
       <textarea class="adv" rows="5" placeholder="面談中に自由記入" style="margin-top:12px;width:100%;box-sizing:border-box;min-height:120px;resize:none;overflow:hidden;border:1.5px solid #d5dce8;border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.7;background:#fdfdfe">・レギュラー落ちの話は本人にとって大きい。悔しさ→行動のパターンを深掘りできた
 ・「チームを支える役割」への自覚が強い。裏方志向ではなく戦略志向に近い</textarea>
-      <div style="margin-top:14px;font-size:12px;font-weight:700;color:#5a6577">宿題</div>
-      <div style="margin-top:6px;display:flex;flex-direction:column;gap:6px;font-size:13px;color:#5a6577">
-        <label style="display:flex;align-items:center;gap:8px"><input type="checkbox" checked style="accent-color:#1a3a6e;width:16px;height:16px">高校時代のQ5〜Q10を書く</label>
-        <label style="display:flex;align-items:center;gap:8px"><input type="checkbox" style="accent-color:#1a3a6e;width:16px;height:16px">恩師について家族に聞く</label>
-      </div>
       <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
         <button type="button" style="font-size:12px;font-weight:700;color:#ffffff;background:#1a3a6e;border:none;border-radius:10px;padding:10px 16px">この面談を保存</button>
         <button type="button" style="font-size:12px;font-weight:700;color:#1a3a6e;background:#ffffff;border:1px solid #d5dce8;border-radius:10px;padding:10px 16px">新しい面談を追加</button>
@@ -809,8 +880,10 @@
     </section>
   </div>
 
+  <!-- ===== 4-B. 総括ビュー ===== -->
   <div id="view-summary" style="display:none">
 
+    <!-- 5期分サマリー -->
     <section aria-label="5期分のフィードバックサマリー" style="margin-top:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px">
       <div style="background:#ffffff;border:1px solid #e6eaf1;border-radius:14px;padding:14px">
         <div style="font-size:13px;font-weight:700;color:#1a3a6e">幼少期</div>
@@ -837,6 +910,7 @@
       </div>
     </section>
 
+    <!-- 価値観の変遷マップ -->
     <section aria-label="価値観の変遷マップ" style="margin-top:14px;background:#ffffff;border:1px solid #e6eaf1;border-radius:16px;padding:22px;box-shadow:0 6px 18px -12px rgba(26,58,110,.25)">
       <h2 style="margin:0;font-size:15px;font-weight:900;color:#1a3a6e">価値観の変遷マップ</h2>
       <div style="margin-top:16px;display:flex;align-items:center;gap:0;overflow-x:auto;padding-bottom:6px">
@@ -877,6 +951,7 @@
       </div>
     </section>
 
+    <!-- 企業選びの軸 -->
     <section aria-label="企業選びの軸" style="margin-top:14px;background:#ffffff;border:1px solid #e6eaf1;border-radius:16px;padding:22px;box-shadow:0 6px 18px -12px rgba(26,58,110,.25)">
       <h2 style="margin:0;display:flex;align-items:center;gap:8px;font-size:15px;font-weight:900;color:#1a3a6e">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#4a90d9" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="3"></circle></svg>
@@ -890,6 +965,7 @@
       </div>
     </section>
 
+    <!-- 総括GPTs導線 -->
     <section aria-label="最終フィードバック生成" style="margin-top:14px;background:linear-gradient(135deg,#16305e 0%,#24509a 55%,#3a7cc9 100%);border-radius:18px;padding:24px 22px;color:#ffffff;box-shadow:0 14px 32px -14px rgba(26,58,110,.55);text-align:center">
       <div style="display:inline-flex;align-items:center;gap:8px;font-size:15px;font-weight:900">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffd9a8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18h18M4 17l-1-9 5.5 4L12 5l3.5 7L21 8l-1 9z"></path></svg>
@@ -902,6 +978,7 @@
     </section>
   </div>
 
+  <!-- ===== 未実装タブのプレースホルダ ===== -->
   <div id="view-other" style="display:none">
     <section style="margin-top:12px;border:1.5px dashed #d5dce8;border-radius:14px;padding:40px 20px;text-align:center;color:#a3adbd;font-size:13px">
       この時期のビューは「中学校」と同じテンプレートです（サンプルでは中学校のみ実装）
@@ -911,390 +988,552 @@
 </main>
 </div>
 
-</section>
-<!-- ===== /VIEW advisor-student ===== -->
 
+</div>
 
-<!-- ============================================================ -->
-<!-- ===== SCRIPTS ============================================== -->
-<!-- ============================================================ -->
+<!-- ================= 面談者: 会社一覧 ================= -->
+<div id="scr-advisor-companies" class="screen adv-screen">
+<div class="layout">
+  <aside class="sidebar" aria-label="ナビゲーション">
+    <div style="padding:16px 14px">
+      <div style="font-size:15px;font-weight:900;color:#1a3a6e;margin-bottom:12px">Huddle.biz <span style="font-size:10px;font-weight:700;color:#8a94a6;background:#f1f3f8;padding:2px 8px;border-radius:99px;vertical-align:2px">面談者</span></div>
+      <div role="tablist" aria-label="ナビ切替" style="display:flex;gap:2px;background:#f1f3f8;border-radius:10px;padding:3px;margin-bottom:12px"><a href="#advisor-student" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:5px;font-size:12px;font-weight:500;padding:8px 4px;border-radius:8px;color:#8a94a6"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"></path></svg>学生一覧</a><span style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:5px;font-size:12px;font-weight:700;padding:8px 4px;border-radius:8px;background:#ffffff;color:#1a3a6e;box-shadow:0 1px 4px rgba(26,58,110,.15)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"></rect><path d="M9 22v-4h6v4M8 6h.01M16 6h.01M12 6h.01M8 10h.01M16 10h.01M12 10h.01M8 14h.01M16 14h.01M12 14h.01"></path></svg>会社一覧</span></div>
+      <input class="search" type="search" placeholder="会社名で検索" aria-label="会社名で検索" style="width:100%;box-sizing:border-box;border:1.5px solid #d5dce8;border-radius:10px;padding:10px 12px;font-size:13px;background:#fdfdfe">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+        <select aria-label="業界フィルタ" style="border:1.5px solid #d5dce8;border-radius:10px;padding:8px 8px;font-size:12px;color:#5a6577;background:#fdfdfe"><option>全業界</option><option>金融</option><option>IT・通信</option><option>メーカー</option><option>インフラ</option><option>商社</option><option>サービス</option><option>交通</option><option>不動産</option><option>その他</option></select>
+        <select aria-label="卒業年度フィルタ" style="border:1.5px solid #d5dce8;border-radius:10px;padding:8px 8px;font-size:12px;color:#5a6577;background:#fdfdfe"><option>全年度</option><option>25卒</option><option>26卒</option><option>27卒</option></select>
+      </div>
+    </div>
+  </aside>
+  <main style="min-width:0;padding:20px 24px 80px;max-width:1100px">
+    <h1 style="margin:0;font-size:18px;font-weight:900;color:#1a3a6e">会社一覧 <span style="font-size:12px;font-weight:500;color:#8a94a6;margin-left:6px">6社</span></h1>
+    <div style="margin-top:14px;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px">
+      <a href="#advisor-company-detail" style="position:relative;display:block;background:#ffffff;border:1px solid #e6eaf1;border-radius:14px;padding:18px 20px;box-shadow:0 6px 18px -12px rgba(26,58,110,.25)">
+        <span style="position:absolute;top:14px;right:14px;display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:#c05621;background:#fdeee3;padding:3px 9px;border-radius:99px">選考進行中</span>
+        <div style="display:flex;align-items:center;gap:8px;padding-right:90px">
+          <span style="font-size:15px;font-weight:900;color:#1a3a6e">福岡銀行</span>
+          <span style="font-size:10px;font-weight:700;color:#5a6577;background:#f1f3f8;padding:2px 8px;border-radius:99px">金融</span>
+        </div>
+        <div style="font-size:11px;color:#8a94a6;margin-top:3px">本社: 福岡市中央区</div>
+        <div style="display:flex;gap:14px;margin-top:12px;font-size:12px;color:#5a6577;flex-wrap:wrap">
+          <span>応募中: <b style="color:#1a3a6e;font-weight:900">3</b>名</span><span>最終選考: <b style="color:#1a3a6e;font-weight:900">1</b>名</span><span>内定: <b style="color:#1a3a6e;font-weight:900">1</b>名</span>
+        </div>
+      </a>
+      <a href="#advisor-company-detail" style="position:relative;display:block;background:#ffffff;border:1px solid #e6eaf1;border-radius:14px;padding:18px 20px;box-shadow:0 6px 18px -12px rgba(26,58,110,.25)">
+        
+        <div style="display:flex;align-items:center;gap:8px;padding-right:0">
+          <span style="font-size:15px;font-weight:900;color:#1a3a6e">西日本鉄道</span>
+          <span style="font-size:10px;font-weight:700;color:#5a6577;background:#f1f3f8;padding:2px 8px;border-radius:99px">交通・不動産</span>
+        </div>
+        <div style="font-size:11px;color:#8a94a6;margin-top:3px">本社: 福岡市博多区</div>
+        <div style="display:flex;gap:14px;margin-top:12px;font-size:12px;color:#5a6577;flex-wrap:wrap">
+          <span>応募中: <b style="color:#1a3a6e;font-weight:900">2</b>名</span>
+        </div>
+      </a>
+      <a href="#advisor-company-detail" style="position:relative;display:block;background:#ffffff;border:1px solid #e6eaf1;border-radius:14px;padding:18px 20px;box-shadow:0 6px 18px -12px rgba(26,58,110,.25)">
+        
+        <div style="display:flex;align-items:center;gap:8px;padding-right:0">
+          <span style="font-size:15px;font-weight:900;color:#1a3a6e">九州電力</span>
+          <span style="font-size:10px;font-weight:700;color:#5a6577;background:#f1f3f8;padding:2px 8px;border-radius:99px">インフラ</span>
+        </div>
+        <div style="font-size:11px;color:#8a94a6;margin-top:3px">本社: 福岡市中央区</div>
+        <div style="display:flex;gap:14px;margin-top:12px;font-size:12px;color:#5a6577;flex-wrap:wrap">
+          <span>応募中: <b style="color:#1a3a6e;font-weight:900">1</b>名</span>
+        </div>
+      </a>
+      <a href="#advisor-company-detail" style="position:relative;display:block;background:#ffffff;border:1px solid #e6eaf1;border-radius:14px;padding:18px 20px;box-shadow:0 6px 18px -12px rgba(26,58,110,.25)">
+        
+        <div style="display:flex;align-items:center;gap:8px;padding-right:0">
+          <span style="font-size:15px;font-weight:900;color:#1a3a6e">麻生グループ</span>
+          <span style="font-size:10px;font-weight:700;color:#5a6577;background:#f1f3f8;padding:2px 8px;border-radius:99px">サービス</span>
+        </div>
+        <div style="font-size:11px;color:#8a94a6;margin-top:3px">本社: 飯塚市</div>
+        <div style="display:flex;gap:14px;margin-top:12px;font-size:12px;color:#5a6577;flex-wrap:wrap">
+          <span>応募中: <b style="color:#1a3a6e;font-weight:900">1</b>名</span>
+        </div>
+      </a>
+      <a href="#advisor-company-detail" style="position:relative;display:block;background:#ffffff;border:1px solid #e6eaf1;border-radius:14px;padding:18px 20px;box-shadow:0 6px 18px -12px rgba(26,58,110,.25)">
+        <span style="position:absolute;top:14px;right:14px;display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:#c05621;background:#fdeee3;padding:3px 9px;border-radius:99px">選考進行中</span>
+        <div style="display:flex;align-items:center;gap:8px;padding-right:90px">
+          <span style="font-size:15px;font-weight:900;color:#1a3a6e">ソフトバンク</span>
+          <span style="font-size:10px;font-weight:700;color:#5a6577;background:#f1f3f8;padding:2px 8px;border-radius:99px">IT・通信</span>
+        </div>
+        <div style="font-size:11px;color:#8a94a6;margin-top:3px">本社: 東京都港区</div>
+        <div style="display:flex;gap:14px;margin-top:12px;font-size:12px;color:#5a6577;flex-wrap:wrap">
+          <span>応募中: <b style="color:#1a3a6e;font-weight:900">2</b>名</span><span>最終選考: <b style="color:#1a3a6e;font-weight:900">1</b>名</span>
+        </div>
+      </a>
+      <a href="#advisor-company-detail" style="position:relative;display:block;background:#ffffff;border:1px solid #e6eaf1;border-radius:14px;padding:18px 20px;box-shadow:0 6px 18px -12px rgba(26,58,110,.25)">
+        
+        <div style="display:flex;align-items:center;gap:8px;padding-right:0">
+          <span style="font-size:15px;font-weight:900;color:#1a3a6e">TOTO</span>
+          <span style="font-size:10px;font-weight:700;color:#5a6577;background:#f1f3f8;padding:2px 8px;border-radius:99px">メーカー</span>
+        </div>
+        <div style="font-size:11px;color:#8a94a6;margin-top:3px">本社: 北九州市小倉北区</div>
+        <div style="display:flex;gap:14px;margin-top:12px;font-size:12px;color:#5a6577;flex-wrap:wrap">
+          <span>内定: <b style="color:#1a3a6e;font-weight:900">1</b>名</span>
+        </div>
+      </a>
+    </div>
+    <button type="button" style="margin-top:16px;font-size:13px;font-weight:700;color:#1a3a6e;background:#ffffff;border:1.5px dashed #b9c5d8;border-radius:12px;padding:14px 20px;width:100%">+ 会社を追加</button>
+  </main>
+</div></div>
 
-<!-- ===== 記入画面スクリプト（IIFE） ===== -->
+<!-- ================= 面談者: 会社詳細 ================= -->
+<div id="scr-advisor-company-detail" class="screen adv-screen">
+<div class="layout">
+  <aside class="sidebar" aria-label="ナビゲーション">
+    <div style="padding:16px 14px">
+      <div style="font-size:15px;font-weight:900;color:#1a3a6e;margin-bottom:12px">Huddle.biz <span style="font-size:10px;font-weight:700;color:#8a94a6;background:#f1f3f8;padding:2px 8px;border-radius:99px;vertical-align:2px">面談者</span></div>
+      <div role="tablist" aria-label="ナビ切替" style="display:flex;gap:2px;background:#f1f3f8;border-radius:10px;padding:3px;margin-bottom:12px"><a href="#advisor-student" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:5px;font-size:12px;font-weight:500;padding:8px 4px;border-radius:8px;color:#8a94a6"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"></path></svg>学生一覧</a><span style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:5px;font-size:12px;font-weight:700;padding:8px 4px;border-radius:8px;background:#ffffff;color:#1a3a6e;box-shadow:0 1px 4px rgba(26,58,110,.15)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"></rect><path d="M9 22v-4h6v4M8 6h.01M16 6h.01M12 6h.01M8 10h.01M16 10h.01M12 10h.01M8 14h.01M16 14h.01M12 14h.01"></path></svg>会社一覧</span></div>
+      <a href="#advisor-companies" style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#1a3a6e;padding:8px 4px">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"></path></svg>
+        会社一覧に戻る
+      </a>
+    </div>
+  </aside>
+  <main style="min-width:0;padding:20px 24px 80px;max-width:960px">
+    <a href="#advisor-companies" style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#8a94a6">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"></path></svg>
+      会社一覧に戻る
+    </a>
+    <section aria-label="会社プロフィール" style="margin-top:10px;background:#ffffff;border:1px solid #e6eaf1;border-radius:16px;padding:20px 22px;box-shadow:0 6px 18px -12px rgba(26,58,110,.25)">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap">
+        <div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <h1 style="margin:0;font-size:20px;font-weight:900;color:#1a3a6e">福岡銀行</h1>
+            <span style="font-size:11px;font-weight:700;color:#5a6577;background:#f1f3f8;padding:3px 10px;border-radius:99px">金融・地銀</span>
+          </div>
+          <div style="font-size:12px;color:#5a6577;margin-top:6px">本社: 福岡市中央区 / 従業員: 約3,000名 / <a href="#" style="color:#2f6fb5;font-weight:700">公式サイトを開く ↗</a></div>
+        </div>
+        <button type="button" style="font-size:12px;font-weight:700;color:#1a3a6e;background:#ffffff;border:1px solid #d5dce8;border-radius:10px;padding:10px 16px">編集</button>
+      </div>
+    </section>
+    
+      <section aria-label="26卒（2026年入社）" style="margin-top:16px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <h2 style="margin:0;font-size:14px;font-weight:900;color:#1a3a6e">26卒（2026年入社）</h2>
+          <span style="font-size:11px;font-weight:700;color:#8a94a6;background:#f1f3f8;padding:2px 10px;border-radius:99px">3名</span>
+          <span style="flex:1;height:1px;background:#e6eaf1"></span>
+        </div>
+        <div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid #e6eaf1;border-radius:10px;background:#ffffff;flex-wrap:wrap">
+          <span aria-hidden="true" style="width:30px;height:30px;border-radius:50%;background:#1a3a6e;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0">村</span>
+          <span style="font-size:13px;font-weight:700;color:#2b3442;min-width:80px">村上 彰悟</span>
+          <span style="display:inline-flex;font-size:11px;font-weight:700;color:#ffffff;background:#1a3a6e;padding:3px 10px;border-radius:99px;white-space:nowrap">最終選考</span>
+          <span style="font-size:11px;color:#8a94a6;flex:1">次回面談: 8/15</span>
+          <a href="#advisor-student" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:#2f6fb5;padding:8px 10px">学生詳細へ <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></a>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid #e6eaf1;border-radius:10px;background:#ffffff;flex-wrap:wrap">
+          <span aria-hidden="true" style="width:30px;height:30px;border-radius:50%;background:#1a3a6e;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0">田</span>
+          <span style="font-size:13px;font-weight:700;color:#2b3442;min-width:80px">田中 太郎</span>
+          <span style="display:inline-flex;font-size:11px;font-weight:700;color:#2f6fb5;background:#e3f0fc;padding:3px 10px;border-radius:99px;white-space:nowrap">一次通過</span>
+          <span style="font-size:11px;color:#8a94a6;flex:1"></span>
+          <a href="#advisor-student" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:#2f6fb5;padding:8px 10px">学生詳細へ <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></a>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid #e6eaf1;border-radius:10px;background:#ffffff;flex-wrap:wrap">
+          <span aria-hidden="true" style="width:30px;height:30px;border-radius:50%;background:#1a3a6e;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0">佐</span>
+          <span style="font-size:13px;font-weight:700;color:#2b3442;min-width:80px">佐藤 花子</span>
+          <span style="display:inline-flex;font-size:11px;font-weight:700;color:#ffffff;background:#2f6fb5;padding:3px 10px;border-radius:99px;white-space:nowrap">内定 🎉</span>
+          <span style="font-size:11px;color:#8a94a6;flex:1"></span>
+          <a href="#advisor-student" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:#2f6fb5;padding:8px 10px">学生詳細へ <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></a>
+        </div></div>
+      </section>
+    
+      <section aria-label="25卒（2025年入社）" style="margin-top:16px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <h2 style="margin:0;font-size:14px;font-weight:900;color:#1a3a6e">25卒（2025年入社）</h2>
+          <span style="font-size:11px;font-weight:700;color:#8a94a6;background:#f1f3f8;padding:2px 10px;border-radius:99px">1名</span>
+          <span style="flex:1;height:1px;background:#e6eaf1"></span>
+        </div>
+        <div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid #e6eaf1;border-radius:10px;background:#ffffff;flex-wrap:wrap">
+          <span aria-hidden="true" style="width:30px;height:30px;border-radius:50%;background:#1a3a6e;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0">山</span>
+          <span style="font-size:13px;font-weight:700;color:#2b3442;min-width:80px">山本 蓮</span>
+          <span style="display:inline-flex;font-size:11px;font-weight:700;color:#ffffff;background:#2f6fb5;padding:3px 10px;border-radius:99px;white-space:nowrap">内定 🎉（入社済）</span>
+          <span style="font-size:11px;color:#8a94a6;flex:1"></span>
+          <a href="#advisor-student" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:#2f6fb5;padding:8px 10px">学生詳細へ <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></a>
+        </div></div>
+      </section>
+    
+      <section aria-label="27卒（2027年入社）" style="margin-top:16px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <h2 style="margin:0;font-size:14px;font-weight:900;color:#1a3a6e">27卒（2027年入社）</h2>
+          <span style="font-size:11px;font-weight:700;color:#8a94a6;background:#f1f3f8;padding:2px 10px;border-radius:99px">1名</span>
+          <span style="flex:1;height:1px;background:#e6eaf1"></span>
+        </div>
+        <div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid #e6eaf1;border-radius:10px;background:#ffffff;flex-wrap:wrap">
+          <span aria-hidden="true" style="width:30px;height:30px;border-radius:50%;background:#1a3a6e;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0">井</span>
+          <span style="font-size:13px;font-weight:700;color:#2b3442;min-width:80px">井原 良祐</span>
+          <span style="display:inline-flex;font-size:11px;font-weight:700;color:#2f6fb5;background:#e3f0fc;padding:3px 10px;border-radius:99px;white-space:nowrap">ES提出済</span>
+          <span style="font-size:11px;color:#8a94a6;flex:1"></span>
+          <a href="#advisor-student" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:#2f6fb5;padding:8px 10px">学生詳細へ <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></a>
+        </div></div>
+      </section>
+    <button type="button" style="margin-top:16px;font-size:13px;font-weight:700;color:#1a3a6e;background:#ffffff;border:1.5px dashed #b9c5d8;border-radius:12px;padding:14px 20px;width:100%">+ この会社への応募を追加</button>
+    <section aria-label="会社メモ" style="margin-top:18px;background:#ffffff;border:1px solid #e6eaf1;border-radius:16px;padding:22px;box-shadow:0 6px 18px -12px rgba(26,58,110,.25)">
+      <h2 style="margin:0;display:flex;align-items:center;gap:8px;font-size:15px;font-weight:900;color:#1a3a6e">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#4a90d9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg>
+        会社メモ <span style="font-size:11px;font-weight:500;color:#8a94a6">（太田さん記入）</span>
+      </h2>
+      <textarea class="adv" id="companyMemo" rows="4" placeholder="選考の特徴・過去の傾向などを記入" style="margin-top:12px;width:100%;box-sizing:border-box;min-height:110px;resize:none;overflow:hidden;border:1.5px solid #d5dce8;border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.7;background:#fdfdfe">・選考は面接3回、逆質問重視
+・過去の内定者は「地域貢献」を軸に語れるタイプ
+・一次面接は人事、二次はマネージャー、最終は役員</textarea>
+      <div id="memoStatus" aria-live="polite" style="margin-top:8px;text-align:right;font-size:11px;color:#8a94a6">自動保存: ✓ 保存済み</div>
+    </section>
+  </main>
+</div></div>
+
+<!-- ================= デモバー ================= -->
+<div aria-label="デモ操作バー" style="position:fixed;left:50%;bottom:12px;transform:translateX(-50%);z-index:99;background:#ffffff;border:1px solid #e6eaf1;border-radius:99px;box-shadow:0 12px 32px -10px rgba(26,58,110,.4);padding:6px 8px;display:flex;align-items:center;gap:8px;max-width:calc(100vw - 16px);overflow-x:auto">
+  <div id="roleSeg" style="display:flex;gap:2px;background:#f1f3f8;border-radius:99px;padding:3px;flex-shrink:0">
+    <button type="button" data-role="student" style="font-size:11px;font-weight:700;border:none;border-radius:99px;padding:6px 12px;background:#1a3a6e;color:#fff">学生</button>
+    <button type="button" data-role="advisor" style="font-size:11px;font-weight:700;border:none;border-radius:99px;padding:6px 12px;background:transparent;color:#8a94a6">面談者</button>
+  </div>
+  <span id="screenChips" style="display:flex;gap:4px;flex-shrink:0"></span>
+</div>
+
 <script>
-(function () {
-  const root = document.getElementById('view-student-entry');
-  const QUESTIONS = [
-    { q:'中学校時代、部活動・習い事で熱中したことは何ですか？', hints:['時間を忘れて取り組んだ場面や、続けたいと思った理由を思い出してください','楽しさ・競争心・仲間との関係など、夢中になれた要素を振り返ってみてください'],
-      a:'野球部に所属し、キャッチャーとして毎日練習に打ち込んだ。特に守備の要としてチーム全体を見る役割にやりがいを感じていた。' },
-    { q:'中学時代に自分を成長させた出来事は何ですか？', hints:['失敗や挫折も含めて、考え方が変わったきっかけを思い出してください'],
-      a:'2年生のとき、レギュラーを後輩に奪われた。悔しさから自主練を始め、半年後にポジションを取り戻した経験が「努力は裏切らない」という考えの原点になった。' },
-    { q:'チームや集団の中で、自分はどのような役割を担っていましたか？', hints:['キャプテン等の肩書きだけでなく、実際に果たしていた役割を考えてみてください','周りからどう頼られていたかも手がかりになります'],
-      a:'キャッチャーというポジション柄、ピッチャーの調子を見て声をかけたり、守備の位置を指示したりする「まとめ役」だった。' },
-    { q:'勉強面で頑張ったこと、苦手だったことは何ですか？', hints:['得意・不得意の理由まで考えると、自分の学び方の特徴が見えてきます'],
-      a:'数学は好きで得意だったが、英語の暗記が苦手だった。テスト前に友達と問題を出し合う勉強法が自分には合っていた。' },
-    { q:'中学時代の友人関係はどのようなものでしたか？', hints:['どんな友達と、どんな関係を築いていたかを思い出してください'],
-      a:'部活の仲間が中心。休日も一緒に自主練したり遊んだりして、今でも連絡を取り合う友人が多い。' },
-    { q:'先生や大人との関わりで印象に残っていることは？', hints:['褒められたこと・叱られたこと、どちらも手がかりになります'],
-      a:'野球部の顧問に「お前は周りをよく見ている」と言われたことが嬉しくて、今でも覚えている。' },
-    { q:'当時、どんなことに悩んでいましたか？', hints:['当時は言えなかったことでも、今なら書けることがあるかもしれません'],
-      a:'身長が伸びず、体格差で負けることが多かった。技術と頭を使うプレーでカバーしようと考えるようになった。' },
-    { q:'家族との関係はどうでしたか？', hints:['家族の中での自分の立ち位置や、影響を受けたことを思い出してください'],
-      a:'毎週末、父が練習に付き合ってくれた。母は弁当で応援してくれるタイプで、家族の支えが当たり前にあった。' },
-    { q:'一番嬉しかった出来事は何ですか？', hints:['そのとき「なぜ嬉しかったのか」まで書けると自己分析が深まります'],
-      a:'3年最後の大会で、自分のリードでエースが完封したこと。自分の準備がチームの結果につながった実感があった。' },
-    { q:'一番悔しかった出来事は何ですか？', hints:['悔しさをどう処理したかに、あなたの特徴が表れます'],
-      a:'最後の大会で県大会出場を逃したこと。ミーティングで泣いたのは後にも先にもあの時だけ。' },
-    { q:'どんなことにお金や時間を使っていましたか？', hints:['夢中だったものには価値観のヒントがあります'],
-      a:'お小遣いはほぼ野球用品。時間も野球中心で、プロ野球の配球をノートにまとめるのが趣味だった。' },
-    { q:'当時の将来の夢は何でしたか？', hints:['実現したかどうかは関係ありません。なぜそれに憧れたかが大事です'],
-      a:'プロ野球選手。体格の限界を感じてからは「野球に関わる仕事」に憧れが変わっていった。' },
-    { q:'中学時代の自分を一言で表すと？', hints:['周りからの評価と自己評価、両方から考えてみてください'],
-      a:'「縁の下の', partial:true },
-    { q:'周りの人からどんな人だと言われていましたか？', hints:['家族・友人・先生、それぞれからの見え方を思い出してください'] },
-    { q:'何をしているときが一番楽しかったですか？', hints:['部活以外の時間も含めて振り返ってみてください'] },
-    { q:'逆に、嫌だった・避けていたことは何ですか？', hints:['苦手なことにも自分らしさのヒントがあります'] },
-    { q:'中学時代に大切にしていた考え方・こだわりは？', hints:['「これだけは譲れなかった」ことを思い出してください'] },
-    { q:'小学校時代と比べて、自分はどう変わりましたか？', hints:['環境の変化（部活・人間関係）が自分に与えた影響を考えてみてください'] },
-    { q:'当時の経験で、今の自分につながっていることは？', hints:['考え方・習慣・人との関わり方など、何でも構いません'] },
-    { q:'中学校時代を総括して、自由に書いてください', hints:['うまくまとめる必要はありません。思いつくままでOKです'] }
-  ];
+// ===== 記入画面（学生） =====
+(function(){
+// ===== 質問データ（GAS実装時はサーバから差し込み。深掘りメモ列はバックエンドのみ、学生画面非表示） =====
+const QUESTIONS = [
+  { q:'中学校時代、部活動・習い事で熱中したことは何ですか？', hints:['時間を忘れて取り組んだ場面や、続けたいと思った理由を思い出してください','楽しさ・競争心・仲間との関係など、夢中になれた要素を振り返ってみてください'],
+    a:'野球部に所属し、キャッチャーとして毎日練習に打ち込んだ。特に守備の要としてチーム全体を見る役割にやりがいを感じていた。' },
+  { q:'中学時代に自分を成長させた出来事は何ですか？', hints:['失敗や挫折も含めて、考え方が変わったきっかけを思い出してください'],
+    a:'2年生のとき、レギュラーを後輩に奪われた。悔しさから自主練を始め、半年後にポジションを取り戻した経験が「努力は裏切らない」という考えの原点になった。' },
+  { q:'チームや集団の中で、自分はどのような役割を担っていましたか？', hints:['キャプテン等の肩書きだけでなく、実際に果たしていた役割を考えてみてください','周りからどう頼られていたかも手がかりになります'],
+    a:'キャッチャーというポジション柄、ピッチャーの調子を見て声をかけたり、守備の位置を指示したりする「まとめ役」だった。' },
+  { q:'勉強面で頑張ったこと、苦手だったことは何ですか？', hints:['得意・不得意の理由まで考えると、自分の学び方の特徴が見えてきます'],
+    a:'数学は好きで得意だったが、英語の暗記が苦手だった。テスト前に友達と問題を出し合う勉強法が自分には合っていた。' },
+  { q:'中学時代の友人関係はどのようなものでしたか？', hints:['どんな友達と、どんな関係を築いていたかを思い出してください'],
+    a:'部活の仲間が中心。休日も一緒に自主練したり遊んだりして、今でも連絡を取り合う友人が多い。' },
+  { q:'先生や大人との関わりで印象に残っていることは？', hints:['褒められたこと・叱られたこと、どちらも手がかりになります'],
+    a:'野球部の顧問に「お前は周りをよく見ている」と言われたことが嬉しくて、今でも覚えている。' },
+  { q:'当時、どんなことに悩んでいましたか？', hints:['当時は言えなかったことでも、今なら書けることがあるかもしれません'],
+    a:'身長が伸びず、体格差で負けることが多かった。技術と頭を使うプレーでカバーしようと考えるようになった。' },
+  { q:'家族との関係はどうでしたか？', hints:['家族の中での自分の立ち位置や、影響を受けたことを思い出してください'],
+    a:'毎週末、父が練習に付き合ってくれた。母は弁当で応援してくれるタイプで、家族の支えが当たり前にあった。' },
+  { q:'一番嬉しかった出来事は何ですか？', hints:['そのとき「なぜ嬉しかったのか」まで書けると自己分析が深まります'],
+    a:'3年最後の大会で、自分のリードでエースが完封したこと。自分の準備がチームの結果につながった実感があった。' },
+  { q:'一番悔しかった出来事は何ですか？', hints:['悔しさをどう処理したかに、あなたの特徴が表れます'],
+    a:'最後の大会で県大会出場を逃したこと。ミーティングで泣いたのは後にも先にもあの時だけ。' },
+  { q:'どんなことにお金や時間を使っていましたか？', hints:['夢中だったものには価値観のヒントがあります'],
+    a:'お小遣いはほぼ野球用品。時間も野球中心で、プロ野球の配球をノートにまとめるのが趣味だった。' },
+  { q:'当時の将来の夢は何でしたか？', hints:['実現したかどうかは関係ありません。なぜそれに憧れたかが大事です'],
+    a:'プロ野球選手。体格の限界を感じてからは「野球に関わる仕事」に憧れが変わっていった。' },
+  { q:'中学時代の自分を一言で表すと？', hints:['周りからの評価と自己評価、両方から考えてみてください'],
+    a:'「縁の下の', partial:true },
+  { q:'周りの人からどんな人だと言われていましたか？', hints:['家族・友人・先生、それぞれからの見え方を思い出してください'] },
+  { q:'何をしているときが一番楽しかったですか？', hints:['部活以外の時間も含めて振り返ってみてください'] },
+  { q:'逆に、嫌だった・避けていたことは何ですか？', hints:['苦手なことにも自分らしさのヒントがあります'] },
+  { q:'中学時代に大切にしていた考え方・こだわりは？', hints:['「これだけは譲れなかった」ことを思い出してください'] },
+  { q:'小学校時代と比べて、自分はどう変わりましたか？', hints:['環境の変化（部活・人間関係）が自分に与えた影響を考えてみてください'] },
+  { q:'当時の経験で、今の自分につながっていることは？', hints:['考え方・習慣・人との関わり方など、何でも構いません'] },
+  { q:'中学校時代を総括して、自由に書いてください', hints:['うまくまとめる必要はありません。思いつくままでOKです'] }
+];
 
-  const qlist = root.querySelector('#qlist-entry');
-  const esc = (s) => s.replace(/[&<>"]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const qlist = document.getElementById('qlist');
+const esc = (s) => s.replace(/[&<>"]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
-  QUESTIONS.forEach((item, i) => {
-    const card = document.createElement('section');
-    card.setAttribute('aria-label', 'Q' + (i+1));
-    card.style.cssText = 'position:relative;overflow:hidden;background:#ffffff;border:1px solid #e6eaf1;border-radius:16px;padding:20px;box-shadow:0 6px 18px -12px rgba(26,58,110,.25)';
-    card.innerHTML =
-      '<div class="qline" style="display:none;position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,#4a90d9,#1a3a6e)"></div>' +
-      '<div style="display:flex;align-items:flex-start;gap:8px">' +
-        '<span class="qcheck" style="display:none;flex-shrink:0;width:20px;height:20px;border-radius:50%;background:#1a3a6e;color:#ffffff;font-size:11px;font-weight:700;text-align:center;line-height:20px;margin-top:2px">✓</span>' +
-        '<h2 style="margin:0;font-size:15px;font-weight:700;color:#1a3a6e;line-height:1.6"><span style="color:#4a90d9">Q' + (i+1) + '.</span> ' + esc(item.q) + '</h2>' +
-      '</div>' +
-      '<textarea class="ans" rows="3" placeholder="答えを書いてください" style="margin-top:12px;width:100%;box-sizing:border-box;min-height:76px;resize:none;overflow:hidden;border:1.5px solid #d5dce8;border-radius:10px;padding:12px 14px;font-size:14px;line-height:1.7;color:#2b3442;background:#fdfdfe;transition:border-color .2s">' + esc(item.a || '') + '</textarea>' +
-      '<div style="margin-top:10px;background:#eef5fc;border-radius:10px;padding:12px 14px">' +
-        '<div style="font-size:11px;font-weight:700;color:#2f6fb5;margin-bottom:4px">💡 回答ヒント</div>' +
-        item.hints.map((h) => '<div style="font-size:12px;color:#5a748f;line-height:1.7">・' + esc(h) + '</div>').join('') +
-      '</div>' +
-      '<div class="stamp" style="margin-top:8px;text-align:right;font-size:10px;color:#a3adbd">' + (item.a ? (item.partial ? '2分前に保存' : '1時間前に保存') : '') + '</div>';
-    qlist.appendChild(card);
-  });
+// ===== 質問カード生成 =====
+QUESTIONS.forEach((item, i) => {
+  const card = document.createElement('section');
+  card.setAttribute('aria-label', 'Q' + (i+1));
+  card.style.cssText = 'position:relative;overflow:hidden;background:#ffffff;border:1px solid #e6eaf1;border-radius:16px;padding:20px;box-shadow:0 6px 18px -12px rgba(26,58,110,.25)';
+  card.innerHTML =
+    '<div class="qline" style="display:none;position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,#4a90d9,#1a3a6e)"></div>' +
+    '<div style="display:flex;align-items:flex-start;gap:8px">' +
+      '<span class="qcheck" style="display:none;flex-shrink:0;width:20px;height:20px;border-radius:50%;background:#1a3a6e;color:#ffffff;font-size:11px;font-weight:700;text-align:center;line-height:20px;margin-top:2px">✓</span>' +
+      '<h2 style="margin:0;font-size:15px;font-weight:700;color:#1a3a6e;line-height:1.6"><span style="color:#4a90d9">Q' + (i+1) + '.</span> ' + esc(item.q) + '</h2>' +
+    '</div>' +
+    '<textarea class="ans" rows="3" placeholder="答えを書いてください" style="margin-top:12px;width:100%;box-sizing:border-box;min-height:76px;resize:none;overflow:hidden;border:1.5px solid #d5dce8;border-radius:10px;padding:12px 14px;font-size:14px;line-height:1.7;color:#2b3442;background:#fdfdfe;transition:border-color .2s">' + esc(item.a || '') + '</textarea>' +
+    '<div style="margin-top:10px;background:#eef5fc;border-radius:10px;padding:12px 14px">' +
+      '<div style="font-size:11px;font-weight:700;color:#2f6fb5;margin-bottom:4px">💡 回答ヒント</div>' +
+      item.hints.map((h) => '<div style="font-size:12px;color:#5a748f;line-height:1.7">・' + esc(h) + '</div>').join('') +
+    '</div>' +
+    '<div class="stamp" style="margin-top:8px;text-align:right;font-size:10px;color:#a3adbd">' + (item.a ? (item.partial ? '2分前に保存' : '1時間前に保存') : '') + '</div>';
+  qlist.appendChild(card);
+});
 
-  const areas = [...root.querySelectorAll('textarea.ans')];
-  function refresh() {
-    let done = 0;
-    areas.forEach((ta) => {
-      const filled = ta.value.trim().length > 0;
-      if (filled) done++;
-      const card = ta.closest('section');
-      card.querySelector('.qline').style.display = filled ? 'block' : 'none';
-      card.querySelector('.qcheck').style.display = filled ? 'block' : 'none';
-    });
-    const pct = Math.round(done / areas.length * 100);
-    root.querySelector('#progCount').textContent = done;
-    root.querySelector('#progBar').style.width = pct + '%';
-    root.querySelector('#progBarWrap').setAttribute('aria-valuenow', done);
-    root.querySelector('#doneCount').textContent = done;
-    root.querySelector('#doneBar').style.width = pct + '%';
-    const remain = areas.length - done;
-    const note = root.querySelector('#remainNote');
-    if (remain > 0) { note.style.display = 'inline-flex'; note.textContent = 'あと' + remain + '問あります（このまま提出もできます）'; }
-    else { note.style.display = 'none'; }
-  }
-
-  function autosize(ta) { ta.style.height = 'auto'; ta.style.height = Math.max(76, ta.scrollHeight) + 'px'; }
-
-  const statusEl = root.querySelector('#saveStatus');
-  let saveTimer, fadeTimer;
-  function showSaved() {
-    statusEl.style.color = '#1a3a6e'; statusEl.style.opacity = '1'; statusEl.textContent = '✓ 保存済み';
-    clearTimeout(fadeTimer); fadeTimer = setTimeout(() => { statusEl.style.opacity = '.35'; }, 3000);
-  }
-  function save(card) {
-    statusEl.style.color = '#8a94a6'; statusEl.style.opacity = '1'; statusEl.textContent = '⌛ 保存中…';
-    setTimeout(() => {
-      showSaved();
-      if (card) card.querySelector('.stamp').textContent = 'たった今保存';
-    }, 600);
-  }
+// ===== 記入済み表示 + プログレス =====
+const areas = [...document.querySelectorAll('textarea.ans')];
+function refresh() {
+  let done = 0;
   areas.forEach((ta) => {
-    autosize(ta);
-    ta.addEventListener('input', () => {
-      autosize(ta); refresh();
-      clearTimeout(saveTimer);
-      saveTimer = setTimeout(() => save(ta.closest('section')), 1000);
-    });
-    ta.addEventListener('blur', () => { clearTimeout(saveTimer); save(ta.closest('section')); });
+    const filled = ta.value.trim().length > 0;
+    if (filled) done++;
+    const card = ta.closest('section');
+    card.querySelector('.qline').style.display = filled ? 'block' : 'none';
+    card.querySelector('.qcheck').style.display = filled ? 'block' : 'none';
   });
+  const pct = Math.round(done / areas.length * 100);
+  document.getElementById('progCount').textContent = done;
+  document.getElementById('progBar').style.width = pct + '%';
+  document.getElementById('progBarWrap').setAttribute('aria-valuenow', done);
+  document.getElementById('doneCount').textContent = done;
+  document.getElementById('doneBar').style.width = pct + '%';
+  const remain = areas.length - done;
+  const note = document.getElementById('remainNote');
+  if (remain > 0) { note.style.display = 'inline-flex'; note.textContent = 'あと' + remain + '問あります（このまま提出もできます）'; }
+  else { note.style.display = 'none'; }
+}
 
-  root.querySelector('#submitBtn').addEventListener('click', function () {
-    this.textContent = '✓ 面談準備完了・面談待ち';
-    this.style.background = '#e9f0fa'; this.style.color = '#1a3a6e'; this.style.cursor = 'default';
+// ===== textareaオートリサイズ =====
+function autosize(ta) { ta.style.height = 'auto'; ta.style.height = Math.max(76, ta.scrollHeight) + 'px'; }
+
+// ===== オートセーブ（UIモック: 入力停止1秒 / blur / 離脱時） =====
+const statusEl = document.getElementById('saveStatus');
+let saveTimer, fadeTimer;
+function showSaved() {
+  statusEl.style.color = '#1a3a6e'; statusEl.style.opacity = '1'; statusEl.textContent = '✓ 保存済み';
+  clearTimeout(fadeTimer); fadeTimer = setTimeout(() => { statusEl.style.opacity = '.35'; }, 3000);
+}
+function save(card) {
+  statusEl.style.color = '#8a94a6'; statusEl.style.opacity = '1'; statusEl.textContent = '⌛ 保存中…';
+  setTimeout(() => { // 実API接続時はここでgoogle.script.run等を呼ぶ
+    showSaved();
+    if (card) card.querySelector('.stamp').textContent = 'たった今保存';
+  }, 600);
+}
+areas.forEach((ta) => {
+  autosize(ta);
+  ta.addEventListener('input', () => {
+    autosize(ta); refresh();
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => save(ta.closest('section')), 1000);
   });
+  ta.addEventListener('blur', () => { clearTimeout(saveTimer); save(ta.closest('section')); });
+});
+window.addEventListener('beforeunload', () => { clearTimeout(saveTimer); /* 離脱時保存: 実装時はsendBeacon */ });
 
-  refresh(); showSaved();
+// ===== 提出ボタン（モック） =====
+document.getElementById('submitBtn').addEventListener('click', function () {
+  this.textContent = '✓ 面談準備完了・面談待ち';
+  this.style.background = '#e9f0fa'; this.style.color = '#1a3a6e'; this.style.cursor = 'default';
+});
+
+refresh(); showSaved();
 })();
 </script>
-
-<!-- ===== 面談者画面スクリプト（IIFE） ===== -->
 <script>
-(function () {
-  const root = document.getElementById('view-advisor-student');
-  const QUESTIONS = [
-    { q:'中学校時代、部活動・習い事で熱中したことは何ですか？',
-      a:'野球部に所属し、キャッチャーとして毎日練習に打ち込んだ。特に守備の要としてチーム全体を見る役割にやりがいを感じていた。',
-      hints:['時間を忘れて取り組んだ場面や、続けたいと思った理由'],
-      memo:'「全体を見る」ことへの言及が多い。俯瞰視点は本人の自覚あり', tags:['貢献','俯瞰力'], skill:'状況把握力・ポジションを問わないリーダーシップ', stamp:'2分前・太田' },
-    { q:'中学時代に自分を成長させた出来事は何ですか？',
-      a:'2年生のとき、レギュラーを後輩に奪われた。悔しさから自主練を始め、半年後にポジションを取り戻した経験が「努力は裏切らない」という考えの原点になった。',
-      hints:['失敗や挫折も含めて、考え方が変わったきっかけ'],
-      memo:'挫折→行動が早い。腐らずに自主練へ向かえた理由を面談で深掘りしたい', tags:['逆境耐性','継続'], skill:'課題に対する自走力', stamp:'5分前・太田' },
-    { q:'チームや集団の中で、自分はどのような役割を担っていましたか？',
-      a:'キャッチャーというポジション柄、ピッチャーの調子を見て声をかけたり、守備の位置を指示したりする「まとめ役」だった。',
-      hints:['肩書きだけでなく、実際に果たしていた役割'],
-      memo:'本人は「まとめ役」と言うが、実態は「調整役+参謀」に近い', tags:['調整力','参謀'], skill:'メンバーの状態を観察して動く調整力', stamp:'8分前・太田' },
-    { q:'勉強面で頑張ったこと、苦手だったことは何ですか？',
-      a:'数学は好きで得意だったが、英語の暗記が苦手だった。テスト前に友達と問題を出し合う勉強法が自分には合っていた。',
-      hints:['得意・不得意の理由まで考える'],
-      memo:'「人と一緒だと頑張れる」パターンがここにも出ている', tags:['協働'], skill:'仲間を巻き込む学習スタイル', stamp:'10分前・太田' },
-    { q:'中学時代の友人関係はどのようなものでしたか？',
-      a:'部活の仲間が中心。休日も一緒に自主練したり遊んだりして、今でも連絡を取り合う友人が多い。',
-      hints:['どんな友達と、どんな関係を築いていたか'],
-      memo:'長期の関係維持ができるタイプ。信頼の築き方を高校編でも確認', tags:['信頼構築'], skill:'長期的な信頼関係の構築力', stamp:'12分前・太田' },
-    { q:'先生や大人との関わりで印象に残っていることは？', a:'野球部の顧問に「お前は周りをよく見ている」と言われたことが嬉しくて、今でも覚えている。', hints:['褒められたこと・叱られたこと'] },
-    { q:'当時、どんなことに悩んでいましたか？', a:'身長が伸びず、体格差で負けることが多かった。技術と頭を使うプレーでカバーしようと考えるようになった。', hints:['当時は言えなかったことでも'] },
-    { q:'家族との関係はどうでしたか？', a:'毎週末、父が練習に付き合ってくれた。母は弁当で応援してくれるタイプで、家族の支えが当たり前にあった。', hints:['家族の中での自分の立ち位置'] },
-    { q:'一番嬉しかった出来事は何ですか？', a:'3年最後の大会で、自分のリードでエースが完封したこと。自分の準備がチームの結果につながった実感があった。', hints:['なぜ嬉しかったのかまで'] },
-    { q:'一番悔しかった出来事は何ですか？', a:'最後の大会で県大会出場を逃したこと。ミーティングで泣いたのは後にも先にもあの時だけ。', hints:['悔しさをどう処理したか'] },
-    { q:'どんなことにお金や時間を使っていましたか？', a:'お小遣いはほぼ野球用品。時間も野球中心で、プロ野球の配球をノートにまとめるのが趣味だった。', hints:['夢中だったものには価値観のヒント'] },
-    { q:'当時の将来の夢は何でしたか？', a:'プロ野球選手。体格の限界を感じてからは「野球に関わる仕事」に憧れが変わっていった。', hints:['なぜそれに憧れたか'] },
-    { q:'中学時代の自分を一言で表すと？', hints:['周りからの評価と自己評価、両方から'] },
-    { q:'周りの人からどんな人だと言われていましたか？', hints:['家族・友人・先生、それぞれから'] },
-    { q:'何をしているときが一番楽しかったですか？', hints:['部活以外の時間も含めて'] },
-    { q:'逆に、嫌だった・避けていたことは何ですか？', hints:['苦手なことにも自分らしさのヒント'] },
-    { q:'中学時代に大切にしていた考え方・こだわりは？', hints:['「これだけは譲れなかった」こと'] },
-    { q:'小学校時代と比べて、自分はどう変わりましたか？', hints:['環境の変化が与えた影響'] },
-    { q:'当時の経験で、今の自分につながっていることは？', hints:['考え方・習慣・人との関わり方など'] },
-    { q:'中学校時代を総括して、自由に書いてください', hints:['思いつくままでOK'] }
-  ];
+// ===== 面談者: 学生詳細 =====
+(function(){
+// ===== 質問データ: 学生回答（Q1〜12）+ 太田さん記入（Q1〜5） =====
+const QUESTIONS = [
+  { q:'中学校時代、部活動・習い事で熱中したことは何ですか？',
+    a:'野球部に所属し、キャッチャーとして毎日練習に打ち込んだ。特に守備の要としてチーム全体を見る役割にやりがいを感じていた。',
+    hints:['時間を忘れて取り組んだ場面や、続けたいと思った理由'],
+    memo:'「全体を見る」ことへの言及が多い。俯瞰視点は本人の自覚あり', tags:['貢献','俯瞰力'], skill:'状況把握力・ポジションを問わないリーダーシップ', stamp:'2分前・太田' },
+  { q:'中学時代に自分を成長させた出来事は何ですか？',
+    a:'2年生のとき、レギュラーを後輩に奪われた。悔しさから自主練を始め、半年後にポジションを取り戻した経験が「努力は裏切らない」という考えの原点になった。',
+    hints:['失敗や挫折も含めて、考え方が変わったきっかけ'],
+    memo:'挫折→行動が早い。腐らずに自主練へ向かえた理由を面談で深掘りしたい', tags:['逆境耐性','継続'], skill:'課題に対する自走力', stamp:'5分前・太田' },
+  { q:'チームや集団の中で、自分はどのような役割を担っていましたか？',
+    a:'キャッチャーというポジション柄、ピッチャーの調子を見て声をかけたり、守備の位置を指示したりする「まとめ役」だった。',
+    hints:['肩書きだけでなく、実際に果たしていた役割'],
+    memo:'本人は「まとめ役」と言うが、実態は「調整役+参謀」に近い', tags:['調整力','参謀'], skill:'メンバーの状態を観察して動く調整力', stamp:'8分前・太田' },
+  { q:'勉強面で頑張ったこと、苦手だったことは何ですか？',
+    a:'数学は好きで得意だったが、英語の暗記が苦手だった。テスト前に友達と問題を出し合う勉強法が自分には合っていた。',
+    hints:['得意・不得意の理由まで考える'],
+    memo:'「人と一緒だと頑張れる」パターンがここにも出ている', tags:['協働'], skill:'仲間を巻き込む学習スタイル', stamp:'10分前・太田' },
+  { q:'中学時代の友人関係はどのようなものでしたか？',
+    a:'部活の仲間が中心。休日も一緒に自主練したり遊んだりして、今でも連絡を取り合う友人が多い。',
+    hints:['どんな友達と、どんな関係を築いていたか'],
+    memo:'長期の関係維持ができるタイプ。信頼の築き方を高校編でも確認', tags:['信頼構築'], skill:'長期的な信頼関係の構築力', stamp:'12分前・太田' },
+  { q:'先生や大人との関わりで印象に残っていることは？', a:'野球部の顧問に「お前は周りをよく見ている」と言われたことが嬉しくて、今でも覚えている。', hints:['褒められたこと・叱られたこと'] },
+  { q:'当時、どんなことに悩んでいましたか？', a:'身長が伸びず、体格差で負けることが多かった。技術と頭を使うプレーでカバーしようと考えるようになった。', hints:['当時は言えなかったことでも'] },
+  { q:'家族との関係はどうでしたか？', a:'毎週末、父が練習に付き合ってくれた。母は弁当で応援してくれるタイプで、家族の支えが当たり前にあった。', hints:['家族の中での自分の立ち位置'] },
+  { q:'一番嬉しかった出来事は何ですか？', a:'3年最後の大会で、自分のリードでエースが完封したこと。自分の準備がチームの結果につながった実感があった。', hints:['なぜ嬉しかったのかまで'] },
+  { q:'一番悔しかった出来事は何ですか？', a:'最後の大会で県大会出場を逃したこと。ミーティングで泣いたのは後にも先にもあの時だけ。', hints:['悔しさをどう処理したか'] },
+  { q:'どんなことにお金や時間を使っていましたか？', a:'お小遣いはほぼ野球用品。時間も野球中心で、プロ野球の配球をノートにまとめるのが趣味だった。', hints:['夢中だったものには価値観のヒント'] },
+  { q:'当時の将来の夢は何でしたか？', a:'プロ野球選手。体格の限界を感じてからは「野球に関わる仕事」に憧れが変わっていった。', hints:['なぜそれに憧れたか'] },
+  { q:'中学時代の自分を一言で表すと？', hints:['周りからの評価と自己評価、両方から'] },
+  { q:'周りの人からどんな人だと言われていましたか？', hints:['家族・友人・先生、それぞれから'] },
+  { q:'何をしているときが一番楽しかったですか？', hints:['部活以外の時間も含めて'] },
+  { q:'逆に、嫌だった・避けていたことは何ですか？', hints:['苦手なことにも自分らしさのヒント'] },
+  { q:'中学時代に大切にしていた考え方・こだわりは？', hints:['「これだけは譲れなかった」こと'] },
+  { q:'小学校時代と比べて、自分はどう変わりましたか？', hints:['環境の変化が与えた影響'] },
+  { q:'当時の経験で、今の自分につながっていることは？', hints:['考え方・習慣・人との関わり方など'] },
+  { q:'中学校時代を総括して、自由に書いてください', hints:['思いつくままでOK'] }
+];
 
-  const esc = (s) => (s||'').replace(/[&<>"]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-  const qlist = root.querySelector('#qlist-advisor');
+const esc = (s) => (s||'').replace(/[&<>"]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const qlist = document.getElementById('aqlist');
 
-  QUESTIONS.forEach((item, i) => {
-    const filled = !!(item.memo || (item.tags && item.tags.length) || item.skill);
-    const card = document.createElement('section');
-    card.style.cssText = 'position:relative;overflow:hidden;background:#ffffff;border:1px solid #e6eaf1;border-radius:16px;padding:20px;box-shadow:0 6px 18px -12px rgba(26,58,110,.25)';
-    card.innerHTML =
-      '<div class="qline" style="display:' + (filled ? 'block' : 'none') + ';position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,#4a90d9,#1a3a6e)"></div>' +
-      '<h3 style="margin:0;font-size:14px;font-weight:700;color:#1a3a6e;line-height:1.6"><span style="color:#4a90d9">Q' + (i+1) + '.</span> ' + esc(item.q) + '</h3>' +
-      (item.a
-        ? '<div style="margin-top:10px;background:#f7f8fb;border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.8;color:#3d4655" aria-label="学生の回答（編集不可）">' + esc(item.a) + '</div>'
-        : '<div style="margin-top:10px;border:1.5px dashed #e0e6ef;border-radius:10px;padding:12px 14px;font-size:12px;color:#a3adbd">学生は未回答です</div>') +
-      '<details style="margin-top:8px"><summary style="font-size:11px;font-weight:700;color:#8a94a6">💡 回答ヒントを表示</summary><div style="margin-top:4px;font-size:12px;color:#8a94a6;line-height:1.7">' + item.hints.map((h)=>'・'+esc(h)).join('<br>') + '</div></details>' +
-      '<div style="margin:14px 0 10px;display:flex;align-items:center;gap:10px"><span style="font-size:11px;font-weight:700;color:#2f6fb5;white-space:nowrap">太田さんの記入欄</span><span style="flex:1;height:1px;background:#e6eaf1"></span></div>' +
-      '<label style="font-size:12px;font-weight:700;color:#5a6577">🔍 深掘りメモ</label>' +
-      '<textarea class="adv memo" rows="2" placeholder="面談中のメモを書く" style="margin-top:5px;width:100%;box-sizing:border-box;min-height:56px;resize:none;overflow:hidden;border:1.5px solid #d5dce8;border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.7;background:#fdfdfe">' + esc(item.memo) + '</textarea>' +
-      '<label style="display:block;margin-top:10px;font-size:12px;font-weight:700;color:#5a6577">🏷 価値観・強みキーワード</label>' +
-      '<div class="tagbox" style="margin-top:5px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;border:1.5px solid #d5dce8;border-radius:10px;padding:8px 10px;background:#fdfdfe">' +
-        '<input class="tagin" type="text" placeholder="+ Enterで追加" style="flex:1;min-width:110px;border:none;background:transparent;font-size:12px;padding:4px 2px">' +
-      '</div>' +
-      '<label style="display:block;margin-top:10px;font-size:12px;font-weight:700;color:#5a6577">💼 社会で活きる力</label>' +
-      '<textarea class="adv skill" rows="1" placeholder="短めでOK" style="margin-top:5px;width:100%;box-sizing:border-box;min-height:42px;resize:none;overflow:hidden;border:1.5px solid #d5dce8;border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.7;background:#fdfdfe">' + esc(item.skill) + '</textarea>' +
-      '<div class="stamp" style="margin-top:8px;text-align:right;font-size:10px;color:#a3adbd">' + (item.stamp ? '最終更新: ' + item.stamp : '') + '</div>';
-    qlist.appendChild(card);
-    const tagbox = card.querySelector('.tagbox');
-    (item.tags || []).forEach((t) => addTag(tagbox, t));
+QUESTIONS.forEach((item, i) => {
+  const filled = !!(item.memo || (item.tags && item.tags.length) || item.skill);
+  const card = document.createElement('section');
+  card.style.cssText = 'position:relative;overflow:hidden;background:#ffffff;border:1px solid #e6eaf1;border-radius:16px;padding:20px;box-shadow:0 6px 18px -12px rgba(26,58,110,.25)';
+  card.innerHTML =
+    '<div class="qline" style="display:' + (filled ? 'block' : 'none') + ';position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,#4a90d9,#1a3a6e)"></div>' +
+    '<h3 style="margin:0;font-size:14px;font-weight:700;color:#1a3a6e;line-height:1.6"><span style="color:#4a90d9">Q' + (i+1) + '.</span> ' + esc(item.q) + '</h3>' +
+    (item.a
+      ? '<div style="margin-top:10px;background:#f7f8fb;border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.8;color:#3d4655" aria-label="学生の回答（編集不可）">' + esc(item.a) + '</div>'
+      : '<div style="margin-top:10px;border:1.5px dashed #e0e6ef;border-radius:10px;padding:12px 14px;font-size:12px;color:#a3adbd">学生は未回答です</div>') +
+    '<details style="margin-top:8px"><summary style="font-size:11px;font-weight:700;color:#8a94a6">💡 回答ヒントを表示</summary><div style="margin-top:4px;font-size:12px;color:#8a94a6;line-height:1.7">' + item.hints.map((h)=>'・'+esc(h)).join('<br>') + '</div></details>' +
+    '<div style="margin:14px 0 10px;display:flex;align-items:center;gap:10px"><span style="font-size:11px;font-weight:700;color:#2f6fb5;white-space:nowrap">太田さんの記入欄</span><span style="flex:1;height:1px;background:#e6eaf1"></span></div>' +
+    '<label style="font-size:12px;font-weight:700;color:#5a6577">🔍 深掘りメモ</label>' +
+    '<textarea class="adv memo" rows="2" placeholder="面談中のメモを書く" style="margin-top:5px;width:100%;box-sizing:border-box;min-height:56px;resize:none;overflow:hidden;border:1.5px solid #d5dce8;border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.7;background:#fdfdfe">' + esc(item.memo) + '</textarea>' +
+    '<label style="display:block;margin-top:10px;font-size:12px;font-weight:700;color:#5a6577">🏷 価値観・強みキーワード</label>' +
+    '<div class="tagbox" style="margin-top:5px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;border:1.5px solid #d5dce8;border-radius:10px;padding:8px 10px;background:#fdfdfe">' +
+      '<input class="tagin" type="text" placeholder="+ Enterで追加" style="flex:1;min-width:110px;border:none;background:transparent;font-size:12px;padding:4px 2px">' +
+    '</div>' +
+    '<label style="display:block;margin-top:10px;font-size:12px;font-weight:700;color:#5a6577">💼 社会で活きる力</label>' +
+    '<textarea class="adv skill" rows="1" placeholder="短めでOK" style="margin-top:5px;width:100%;box-sizing:border-box;min-height:42px;resize:none;overflow:hidden;border:1.5px solid #d5dce8;border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.7;background:#fdfdfe">' + esc(item.skill) + '</textarea>' +
+    '<div class="stamp" style="margin-top:8px;text-align:right;font-size:10px;color:#a3adbd">' + (item.stamp ? '最終更新: ' + item.stamp : '') + '</div>';
+  qlist.appendChild(card);
+  const tagbox = card.querySelector('.tagbox');
+  (item.tags || []).forEach((t) => addTag(tagbox, t));
+});
+
+// ===== タグ入力 =====
+function addTag(box, text) {
+  const tag = document.createElement('span');
+  tag.style.cssText = 'display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#1a3a6e;background:#e9f0fa;padding:4px 8px 4px 10px;border-radius:99px';
+  tag.innerHTML = esc(text) + '<button type="button" aria-label="削除" style="border:none;background:transparent;color:#8a94a6;font-size:12px;line-height:1;padding:0 2px">×</button>';
+  tag.querySelector('button').addEventListener('click', () => { tag.remove(); markSaved(box.closest('section')); });
+  box.insertBefore(tag, box.querySelector('.tagin'));
+}
+document.querySelectorAll('.tagin').forEach((input) => {
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && input.value.trim()) {
+      e.preventDefault();
+      addTag(input.closest('.tagbox'), input.value.trim());
+      input.value = '';
+      markSaved(input.closest('section'));
+    }
   });
+});
 
-  function addTag(box, text) {
-    const tag = document.createElement('span');
-    tag.style.cssText = 'display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#1a3a6e;background:#e9f0fa;padding:4px 8px 4px 10px;border-radius:99px';
-    tag.innerHTML = esc(text) + '<button type="button" aria-label="削除" style="border:none;background:transparent;color:#8a94a6;font-size:12px;line-height:1;padding:0 2px">×</button>';
-    tag.querySelector('button').addEventListener('click', () => { tag.remove(); markSaved(box.closest('section')); });
-    box.insertBefore(tag, box.querySelector('.tagin'));
+// ===== オートリサイズ + 独立オートセーブ（モック） =====
+function autosize(ta) { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; }
+function markSaved(card) {
+  if (!card) return;
+  const stamp = card.querySelector('.stamp');
+  if (stamp) stamp.textContent = '最終更新: たった今・太田';
+  const line = card.querySelector('.qline');
+  if (line) {
+    const hasContent = [...card.querySelectorAll('textarea.adv')].some((t) => t.value.trim()) || card.querySelectorAll('.tagbox span').length > 0;
+    line.style.display = hasContent ? 'block' : 'none';
   }
-  root.querySelectorAll('.tagin').forEach((input) => {
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && input.value.trim()) {
-        e.preventDefault();
-        addTag(input.closest('.tagbox'), input.value.trim());
-        input.value = '';
-        markSaved(input.closest('section'));
-      }
+}
+document.querySelectorAll('textarea.adv').forEach((ta) => {
+  autosize(ta);
+  let timer;
+  ta.addEventListener('input', () => { autosize(ta); clearTimeout(timer); timer = setTimeout(() => markSaved(ta.closest('section')), 1000); });
+  ta.addEventListener('blur', () => { clearTimeout(timer); markSaved(ta.closest('section')); });
+});
+
+// ===== 時期タブ切替 =====
+const views = { normal: document.getElementById('view-normal'), summary: document.getElementById('view-summary'), other: document.getElementById('view-other') };
+const tabs = [...document.querySelectorAll('.ptab')];
+tabs.forEach((tab) => {
+  tab.addEventListener('click', () => {
+    Object.entries(views).forEach(([k, el]) => { el.style.display = (k === tab.dataset.view) ? 'block' : 'none'; });
+    tabs.forEach((t) => {
+      if (t.dataset.view === 'summary') return; // 総括タブはゴールドのまま
+      const active = t === tab;
+      const done = t.textContent.includes('✓');
+      t.style.background = active ? 'linear-gradient(135deg,#1a3a6e,#2f6fb5)' : (done ? '#e9f0fa' : '#ffffff');
+      t.style.color = active ? '#ffffff' : (done ? '#1a3a6e' : '#8a94a6');
+      t.style.border = active ? '1px solid transparent' : (done ? '1px solid #e9f0fa' : '1px solid #e6eaf1');
     });
   });
+});
 
-  function autosize(ta) { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; }
-  function markSaved(card) {
-    if (!card) return;
-    const stamp = card.querySelector('.stamp');
-    if (stamp) stamp.textContent = '最終更新: たった今・太田';
-    const line = card.querySelector('.qline');
-    if (line) {
-      const hasContent = [...card.querySelectorAll('textarea.adv')].some((t) => t.value.trim()) || card.querySelectorAll('.tagbox span').length > 0;
-      line.style.display = hasContent ? 'block' : 'none';
-    }
+// ===== フィードバック生成用コピー（モック） =====
+document.getElementById('copyBtn').addEventListener('click', function () {
+  const text = QUESTIONS.map((it, i) => 'Q' + (i+1) + '. ' + it.q + '\n回答: ' + (it.a || '（未回答）') + (it.memo ? '\n深掘りメモ: ' + it.memo : '')).join('\n\n');
+  navigator.clipboard && navigator.clipboard.writeText(text);
+  const orig = this.textContent;
+  this.textContent = '✓ コピーしました';
+  setTimeout(() => { this.textContent = orig; }, 2000);
+});
+})();
+</script>
+<script>
+// ===== ルーター + デモバー + 新画面のJS =====
+(function(){
+  const SCREENS = {
+    'student-home':            { el:'scr-student-home', role:'student', label:'ホーム' },
+    'student-entry':           { el:'scr-student-entry', role:'student', label:'記入' },
+    'student-companies':       { el:'scr-student-companies', role:'student', label:'志望企業' },
+    'advisor-student':         { el:'scr-advisor-student', role:'advisor', label:'学生詳細', view:'normal' },
+    'advisor-student-soukatsu':{ el:'scr-advisor-student', role:'advisor', label:'総括', view:'summary' },
+    'advisor-companies':       { el:'scr-advisor-companies', role:'advisor', label:'会社一覧' },
+    'advisor-company-detail':  { el:'scr-advisor-company-detail', role:'advisor', label:'会社詳細' }
+  };
+  const DEFAULTS = { student:'student-home', advisor:'advisor-student' };
+  let role = localStorage.getItem('huddle-demo-role') || 'student';
+
+  const chips = document.getElementById('screenChips');
+  const roleBtns = [...document.querySelectorAll('#roleSeg button')];
+
+  function renderBar(currentKey) {
+    roleBtns.forEach((b) => {
+      const on = b.dataset.role === role;
+      b.style.background = on ? '#1a3a6e' : 'transparent';
+      b.style.color = on ? '#fff' : '#8a94a6';
+    });
+    chips.innerHTML = '';
+    Object.entries(SCREENS).filter(([, s]) => s.role === role).forEach(([key, s]) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = s.label;
+      const on = key === currentKey;
+      btn.style.cssText = 'font-size:11px;font-weight:700;border:1px solid ' + (on ? 'transparent' : '#e6eaf1') + ';border-radius:99px;padding:6px 12px;background:' + (on ? '#e3f0fc' : '#ffffff') + ';color:' + (on ? '#2f6fb5' : '#5a6577') + ';white-space:nowrap';
+      btn.addEventListener('click', () => { location.hash = key; });
+      chips.appendChild(btn);
+    });
   }
-  root.querySelectorAll('textarea.adv').forEach((ta) => {
-    autosize(ta);
+
+  function show(key) {
+    const s = SCREENS[key];
+    if (!s) return; // ページ内アンカー等は無視
+    if (s.role !== role) { location.hash = DEFAULTS[role]; return; } // ロールガード
+    document.querySelectorAll('.screen').forEach((el) => el.classList.remove('active'));
+    document.getElementById(s.el).classList.add('active');
+    if (s.view) {
+      const tab = document.querySelector('#scr-advisor-student .ptab[data-view="' + s.view + '"]');
+      if (tab) tab.click();
+    }
+    window.scrollTo(0, 0);
+    renderBar(key);
+  }
+
+  roleBtns.forEach((b) => b.addEventListener('click', () => {
+    role = b.dataset.role;
+    localStorage.setItem('huddle-demo-role', role);
+    if (location.hash.slice(1) === DEFAULTS[role]) { show(DEFAULTS[role]); } else { location.hash = DEFAULTS[role]; }
+  }));
+
+  window.addEventListener('hashchange', () => show(location.hash.slice(1)));
+  const initial = location.hash.slice(1);
+  if (SCREENS[initial]) {
+    role = SCREENS[initial].role; // URL直叩きはそのロールを優先
+    show(initial);
+  } else {
+    location.hash = DEFAULTS[role];
+    show(DEFAULTS[role]);
+  }
+
+  // 会社メモの自動保存（モック）
+  const memo = document.getElementById('companyMemo');
+  const memoStatus = document.getElementById('memoStatus');
+  if (memo) {
+    const autosize = () => { memo.style.height = 'auto'; memo.style.height = memo.scrollHeight + 'px'; };
+    autosize();
     let timer;
-    ta.addEventListener('input', () => { autosize(ta); clearTimeout(timer); timer = setTimeout(() => markSaved(ta.closest('section')), 1000); });
-    ta.addEventListener('blur', () => { clearTimeout(timer); markSaved(ta.closest('section')); });
-  });
-
-  const views = { normal: root.querySelector('#view-normal'), summary: root.querySelector('#view-summary'), other: root.querySelector('#view-other') };
-  const tabs = [...root.querySelectorAll('.ptab')];
-  tabs.forEach((tab) => {
-    tab.addEventListener('click', () => {
-      Object.entries(views).forEach(([k, el]) => { el.style.display = (k === tab.dataset.view) ? 'block' : 'none'; });
-      tabs.forEach((t) => {
-        if (t.dataset.view === 'summary') return;
-        const active = t === tab;
-        const done = t.textContent.includes('✓');
-        t.style.background = active ? 'linear-gradient(135deg,#1a3a6e,#2f6fb5)' : (done ? '#e9f0fa' : '#ffffff');
-        t.style.color = active ? '#ffffff' : (done ? '#1a3a6e' : '#8a94a6');
-        t.style.border = active ? '1px solid transparent' : (done ? '1px solid #e9f0fa' : '1px solid #e6eaf1');
-      });
-      // 総括タブが押されたらハッシュも同期（任意）
-      if (tab.dataset.view === 'summary' && location.hash !== '#advisor-student-soukatsu') {
-        history.replaceState(null, '', '#advisor-student-soukatsu');
-      } else if (tab.dataset.view !== 'summary' && location.hash === '#advisor-student-soukatsu') {
-        history.replaceState(null, '', '#advisor-student');
-      }
+    memo.addEventListener('input', () => {
+      autosize();
+      memoStatus.textContent = '自動保存: 保存中…';
+      clearTimeout(timer);
+      timer = setTimeout(() => { memoStatus.textContent = '自動保存: ✓ 保存済み'; }, 900);
     });
-  });
-
-  root.querySelector('#copyBtn').addEventListener('click', function () {
-    const text = QUESTIONS.map((it, i) => 'Q' + (i+1) + '. ' + it.q + '\n回答: ' + (it.a || '（未回答）') + (it.memo ? '\n深掘りメモ: ' + it.memo : '')).join('\n\n');
-    if (navigator.clipboard) navigator.clipboard.writeText(text);
-    const orig = this.textContent;
-    this.textContent = '✓ コピーしました';
-    setTimeout(() => { this.textContent = orig; }, 2000);
-  });
-
-  // 「学生画面を確認」→ 学生ホームへ
-  const gotoStudent = root.querySelector('#advGotoStudent');
-  if (gotoStudent) {
-    gotoStudent.addEventListener('click', () => { location.hash = '#student-home'; });
   }
-
-  // 学生リスト内のリンクはハイライトのみ（村上さんは固定）
-  const sidebarLinks = root.querySelectorAll('.adv-sidebar nav a');
-  sidebarLinks.forEach((a) => {
-    a.addEventListener('click', (e) => {
-      e.preventDefault();
-      // 村上さん（aria-current="true"）は固定なので、他は視覚的にhoverのみ
-    });
-  });
-
-  // 外部から総括タブをアクティブにするヘルパを公開
-  window.__advisorActivateSummary = function () {
-    const summaryTab = tabs.find((t) => t.dataset.view === 'summary');
-    if (summaryTab) summaryTab.click();
-  };
-  window.__advisorActivateNormal = function () {
-    const normalTab = tabs.find((t) => t.dataset.view === 'normal');
-    if (normalTab) normalTab.click();
-  };
 })();
 </script>
-
-<!-- ===== ルーティング + ロール切替（IIFE） ===== -->
-<script>
-(function () {
-  const VIEWS = {
-    'student-home': 'view-student-home',
-    'student-entry': 'view-student-entry',
-    'advisor-student': 'view-advisor-student',
-    'advisor-student-soukatsu': 'view-advisor-student'
-  };
-  const STUDENT_HASHES = ['student-home', 'student-entry'];
-  const ADVISOR_HASHES = ['advisor-student', 'advisor-student-soukatsu'];
-
-  const roleSelect = document.getElementById('roleSelect');
-  const LS_ROLE = 'huddle-prototype-role';
-
-  function getRole() {
-    return localStorage.getItem(LS_ROLE) || 'student';
-  }
-  function setRole(role) {
-    localStorage.setItem(LS_ROLE, role);
-    roleSelect.value = role;
-  }
-
-  function getHashName() {
-    const h = (location.hash || '').replace(/^#/, '');
-    return h;
-  }
-
-  function resolveHash() {
-    const name = getHashName();
-    const role = getRole();
-    if (!VIEWS[name]) {
-      // 不明: ロールに応じたデフォルト
-      return role === 'advisor' ? 'advisor-student' : 'student-home';
-    }
-    // ロール整合性チェック
-    if (role === 'student' && ADVISOR_HASHES.indexOf(name) !== -1) return 'student-home';
-    if (role === 'advisor' && STUDENT_HASHES.indexOf(name) !== -1) return 'advisor-student';
-    return name;
-  }
-
-  function applyView() {
-    const targetHash = resolveHash();
-    if (getHashName() !== targetHash) {
-      location.hash = '#' + targetHash;
-      return; // hashchangeで再入
-    }
-    const viewId = VIEWS[targetHash];
-    document.querySelectorAll('.view').forEach((v) => {
-      if (v.id === viewId) {
-        v.classList.add('active');
-      } else {
-        v.classList.remove('active');
-      }
-    });
-    // 総括ハッシュなら総括タブへ切替
-    if (targetHash === 'advisor-student-soukatsu' && typeof window.__advisorActivateSummary === 'function') {
-      window.__advisorActivateSummary();
-    } else if (targetHash === 'advisor-student' && typeof window.__advisorActivateNormal === 'function') {
-      window.__advisorActivateNormal();
-    }
-    // 上部にスクロール
-    window.scrollTo({ top: 0, behavior: 'auto' });
-  }
-
-  // ロール切替
-  roleSelect.addEventListener('change', (e) => {
-    const role = e.target.value;
-    setRole(role);
-    location.hash = (role === 'advisor') ? '#advisor-student' : '#student-home';
-    applyView();
-  });
-
-  // ハッシュ変更
-  window.addEventListener('hashchange', applyView);
-
-  // 「記入をつづける」など、data-nav-entryを持つリンクを student-entry へ
-  document.querySelectorAll('[data-nav-entry]').forEach((el) => {
-    el.addEventListener('click', (e) => {
-      e.preventDefault();
-      location.hash = '#student-entry';
-    });
-  });
-
-  // 初期化
-  setRole(getRole());
-  if (!location.hash) {
-    location.hash = (getRole() === 'advisor') ? '#advisor-student' : '#student-home';
-  }
-  applyView();
-
-  console.log('Huddle.biz Prototype v1.0');
-})();
-</script>
-
 </body>
 </html>
