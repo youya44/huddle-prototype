@@ -579,6 +579,16 @@
     <p style="margin:12px 0 0;font-size:11px;color:#9cc4ef">※ 完了後も回答は編集できます</p>
   </section>
 
+  <!-- ===== 面談予約導線 ===== -->
+  <section aria-label="面談予約" style="margin-top:14px;background:#ffffff;border:1.5px solid #d5dce8;border-radius:16px;padding:22px;text-align:center">
+    <div style="font-size:15px;font-weight:900;color:#1a3a6e">記入おわった？次は面談を予約</div>
+    <p style="margin:8px 0 14px;font-size:12px;color:#5a6577;line-height:1.7">Googleカレンダーで太田さんの空き時間から選べます</p>
+    <a href="https://calendar.google.com/" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:#ffffff;background:#1a3a6e;border-radius:10px;padding:14px 26px;text-decoration:none">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg>
+      面談を予約する
+    </a>
+  </section>
+
   <!-- ===== 前後の時期ナビ ===== -->
   <nav aria-label="前後の時期へ移動" style="margin-top:16px;display:flex;justify-content:space-between;gap:10px">
     <a href="#period-2" style="display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#1a3a6e;background:#ffffff;border:1px solid #e6eaf1;border-radius:10px;padding:12px 18px">
@@ -1037,7 +1047,7 @@
         <span>面談日: <b style="color:#1a3a6e">2026/07/28（第2回）</b></span>
         <span>参加: 村上さん・太田</span>
       </div>
-      <textarea class="adv" rows="5" placeholder="面談中に自由記入" style="margin-top:12px;width:100%;box-sizing:border-box;min-height:120px;resize:none;overflow:hidden;border:1.5px solid #d5dce8;border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.7;background:#fdfdfe">・レギュラー落ちの話は本人にとって大きい。悔しさ→行動のパターンを深掘りできた
+      <textarea class="adv" rows="5" placeholder="Google Docsの議事録をここにコピペ" style="margin-top:12px;width:100%;box-sizing:border-box;min-height:120px;resize:none;overflow:hidden;border:1.5px solid #d5dce8;border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.7;background:#fdfdfe">・レギュラー落ちの話は本人にとって大きい。悔しさ→行動のパターンを深掘りできた
 ・「チームを支える役割」への自覚が強い。裏方志向ではなく戦略志向に近い</textarea>
       <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
         <button type="button" style="font-size:12px;font-weight:700;color:#ffffff;background:#1a3a6e;border:none;border-radius:10px;padding:10px 16px">この面談を保存</button>
@@ -1539,29 +1549,17 @@ const esc = (s) => (s||'').replace(/[&<>"]/g, (c) => ({'&':'&amp;','<':'&lt;','>
 const qlist = document.getElementById('aqlist');
 
 QUESTIONS.forEach((item, i) => {
-  const filled = !!(item.memo || (item.tags && item.tags.length) || item.skill);
+  const answered = !!item.a;
   const card = document.createElement('section');
   card.style.cssText = 'position:relative;overflow:hidden;background:#ffffff;border:1px solid #e6eaf1;border-radius:16px;padding:20px;box-shadow:0 6px 18px -12px rgba(26,58,110,.25)';
   card.innerHTML =
-    '<div class="qline" style="display:' + (filled ? 'block' : 'none') + ';position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,#4a90d9,#1a3a6e)"></div>' +
+    '<div class="qline" style="display:' + (answered ? 'block' : 'none') + ';position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,#4a90d9,#1a3a6e)"></div>' +
     '<h3 style="margin:0;font-size:14px;font-weight:700;color:#1a3a6e;line-height:1.6"><span style="color:#4a90d9">Q' + (i+1) + '.</span> ' + esc(item.q) + '</h3>' +
     (item.a
       ? '<div style="margin-top:10px;background:#f7f8fb;border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.8;color:#3d4655" aria-label="学生の回答（編集不可）">' + esc(item.a) + '</div>'
       : '<div style="margin-top:10px;border:1.5px dashed #e0e6ef;border-radius:10px;padding:12px 14px;font-size:12px;color:#a3adbd">学生は未回答です</div>') +
-    '<details style="margin-top:8px"><summary style="font-size:11px;font-weight:700;color:#8a94a6">💡 回答ヒントを表示</summary><div style="margin-top:4px;font-size:12px;color:#8a94a6;line-height:1.7">' + item.hints.map((h)=>'・'+esc(h)).join('<br>') + '</div></details>' +
-    '<div style="margin:14px 0 10px;display:flex;align-items:center;gap:10px"><span style="font-size:11px;font-weight:700;color:#2f6fb5;white-space:nowrap">太田さんの記入欄</span><span style="flex:1;height:1px;background:#e6eaf1"></span></div>' +
-    '<label style="font-size:12px;font-weight:700;color:#5a6577">🔍 深掘りメモ</label>' +
-    '<textarea class="adv memo" rows="2" placeholder="面談中のメモを書く" style="margin-top:5px;width:100%;box-sizing:border-box;min-height:56px;resize:none;overflow:hidden;border:1.5px solid #d5dce8;border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.7;background:#fdfdfe">' + esc(item.memo) + '</textarea>' +
-    '<label style="display:block;margin-top:10px;font-size:12px;font-weight:700;color:#5a6577">🏷 価値観・強みキーワード</label>' +
-    '<div class="tagbox" style="margin-top:5px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;border:1.5px solid #d5dce8;border-radius:10px;padding:8px 10px;background:#fdfdfe">' +
-      '<input class="tagin" type="text" placeholder="+ Enterで追加" style="flex:1;min-width:110px;border:none;background:transparent;font-size:12px;padding:4px 2px">' +
-    '</div>' +
-    '<label style="display:block;margin-top:10px;font-size:12px;font-weight:700;color:#5a6577">💼 社会で活きる力</label>' +
-    '<textarea class="adv skill" rows="1" placeholder="短めでOK" style="margin-top:5px;width:100%;box-sizing:border-box;min-height:42px;resize:none;overflow:hidden;border:1.5px solid #d5dce8;border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.7;background:#fdfdfe">' + esc(item.skill) + '</textarea>' +
-    '<div class="stamp" style="margin-top:8px;text-align:right;font-size:10px;color:#a3adbd">' + (item.stamp ? '最終更新: ' + item.stamp : '') + '</div>';
+    '<details style="margin-top:8px"><summary style="font-size:11px;font-weight:700;color:#8a94a6">💡 回答ヒントを表示</summary><div style="margin-top:4px;font-size:12px;color:#8a94a6;line-height:1.7">' + item.hints.map((h)=>'・'+esc(h)).join('<br>') + '</div></details>';
   qlist.appendChild(card);
-  const tagbox = card.querySelector('.tagbox');
-  (item.tags || []).forEach((t) => addTag(tagbox, t));
 });
 
 // ===== タグ入力 =====
@@ -1621,7 +1619,7 @@ tabs.forEach((tab) => {
 
 // ===== フィードバック生成用コピー（モック） =====
 document.getElementById('copyBtn').addEventListener('click', function () {
-  const text = QUESTIONS.map((it, i) => 'Q' + (i+1) + '. ' + it.q + '\n回答: ' + (it.a || '（未回答）') + (it.memo ? '\n深掘りメモ: ' + it.memo : '')).join('\n\n');
+  const text = QUESTIONS.map((it, i) => 'Q' + (i+1) + '. ' + it.q + '\n回答: ' + (it.a || '（未回答）')).join('\n\n');
   navigator.clipboard && navigator.clipboard.writeText(text);
   const orig = this.textContent;
   this.textContent = '✓ コピーしました';
