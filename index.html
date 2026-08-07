@@ -984,7 +984,8 @@
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <button type="button" style="font-size:12px;font-weight:700;color:#1a3a6e;background:#ffffff;border:1px solid #d5dce8;border-radius:10px;padding:10px 14px">面談履歴を見る</button>
       <a href="#student-profile" style="font-size:12px;font-weight:700;color:#1a3a6e;background:#ffffff;border:1px solid #d5dce8;border-radius:10px;padding:10px 14px;text-decoration:none">プロフィール編集</a>
-      <button type="button" style="font-size:12px;font-weight:700;color:#ffffff;background:#1a3a6e;border:none;border-radius:10px;padding:10px 14px">学生画面を確認</button>
+      <a href="#career-story" style="font-size:12px;font-weight:700;color:#ffffff;background:#1a3a6e;border:none;border-radius:10px;padding:10px 14px;text-decoration:none">Career Story出力</a>
+      <button type="button" style="font-size:12px;font-weight:700;color:#1a3a6e;background:#ffffff;border:1px solid #d5dce8;border-radius:10px;padding:10px 14px">学生画面を確認</button>
     </div>
   </section>
 
@@ -1382,6 +1383,150 @@
   </main>
 </div></div>
 
+<!-- ================= Career Story 出力（A4テンプレ） ================= -->
+<div id="scr-career-story" class="screen">
+<style>
+  #scr-career-story { background:#eef1f6; }
+  #scr-career-story .cs-toolbar { position:sticky; top:0; z-index:10; background:#ffffff; border-bottom:1px solid #e6eaf1; padding:12px 20px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  #scr-career-story .cs-title { display:flex; align-items:center; gap:10px; font-size:14px; font-weight:900; color:#1a3a6e; }
+  #scr-career-story .cs-actions { display:flex; gap:8px; }
+  #scr-career-story .cs-btn { font-size:12px; font-weight:700; border-radius:10px; padding:10px 16px; border:1px solid #d5dce8; background:#ffffff; color:#1a3a6e; text-decoration:none; cursor:pointer; }
+  #scr-career-story .cs-btn.primary { background:#1a3a6e; color:#ffffff; border-color:transparent; }
+  #scr-career-story .cs-page { width:210mm; min-height:297mm; margin:24px auto; padding:14mm 12mm; background:#ffffff; box-shadow:0 8px 24px -12px rgba(26,58,110,.35); box-sizing:border-box; color:#1a1f2b; font-family:'Noto Sans JP','Hiragino Sans','Yu Gothic',system-ui,sans-serif; font-size:10pt; line-height:1.65; }
+  #scr-career-story .cs-h1 { margin:0 0 12px; font-size:20pt; font-weight:900; color:#1a3a6e; letter-spacing:.02em; }
+  #scr-career-story .cs-grid { display:grid; grid-template-columns:1fr 1fr; gap:8mm; }
+  #scr-career-story .cs-col { display:flex; flex-direction:column; gap:5mm; }
+  #scr-career-story .cs-box { border:1.5px solid #1a3a6e; border-radius:6px; padding:0; overflow:hidden; }
+  #scr-career-story .cs-label { display:block; font-size:9pt; font-weight:700; color:#1a3a6e; padding:6px 12px; border-bottom:1px solid #1a3a6e; background:#ffffff; }
+  #scr-career-story .cs-body { padding:10px 12px; font-size:9.5pt; line-height:1.85; min-height:36pt; }
+  #scr-career-story .cs-empty { color:#c4cddb; font-style:italic; font-size:9pt; }
+  #scr-career-story .cs-profile { border:1.5px solid #1a3a6e; border-radius:6px; padding:10px 12px; display:grid; grid-template-columns:1fr 90px; gap:12px; align-items:start; margin-bottom:6mm; }
+  #scr-career-story .cs-profile .cs-photo { width:90px; height:110px; background:#f1f3f8; border:1px solid #d5dce8; border-radius:4px; display:flex; align-items:center; justify-content:center; color:#8a94a6; font-size:8pt; }
+  #scr-career-story .cs-profile-row { display:grid; grid-template-columns:70px 1fr; gap:6px; font-size:9pt; padding:3px 0; border-bottom:1px dotted #d5dce8; }
+  #scr-career-story .cs-profile-row:last-child { border-bottom:none; }
+  #scr-career-story .cs-profile-row b { font-size:9pt; color:#5a6577; font-weight:700; }
+  #scr-career-story .cs-profile-row .cs-value { color:#1a1f2b; }
+  #scr-career-story .cs-name-row { display:flex; gap:8px; align-items:baseline; padding:6px 0; }
+  #scr-career-story .cs-kana { font-size:8pt; color:#5a6577; }
+  #scr-career-story .cs-name { font-size:15pt; font-weight:900; color:#1a1f2b; }
+  #scr-career-story .cs-history { width:100%; border-collapse:collapse; margin-bottom:6mm; }
+  #scr-career-story .cs-history th, #scr-career-story .cs-history td { border:1px solid #1a3a6e; padding:6px 10px; font-size:9pt; text-align:left; vertical-align:top; }
+  #scr-career-story .cs-history th { background:#eef2f8; font-weight:700; color:#1a3a6e; }
+  #scr-career-story .cs-history th:first-child, #scr-career-story .cs-history td:first-child { width:180px; }
+  #scr-career-story .cs-count { float:right; font-size:8pt; font-weight:500; color:#8a94a6; }
+  #scr-career-story .cs-hobbypic { display:grid; grid-template-columns:1fr 90px; gap:8px; align-items:start; }
+  #scr-career-story .cs-hobbypic .cs-photo2 { width:90px; height:70px; background:#f1f3f8; border:1px solid #d5dce8; border-radius:4px; display:flex; align-items:center; justify-content:center; color:#8a94a6; font-size:8pt; }
+  @media print {
+    body { background:#ffffff !important; }
+    #scr-career-story { background:#ffffff !important; }
+    #scr-career-story .cs-toolbar, #scr-career-story .cs-hint, .demo-hide { display:none !important; }
+    #scr-career-story .cs-page { margin:0 !important; box-shadow:none !important; width:100%; min-height:auto; }
+    @page { size:A4; margin:0; }
+  }
+</style>
+
+<div class="cs-toolbar demo-hide">
+  <div class="cs-title">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1a3a6e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6M9 13h6M9 17h6M9 9h1"></path></svg>
+    Huddle Career Story を出力
+  </div>
+  <div class="cs-actions">
+    <a href="#advisor-student" class="cs-btn">← 学生詳細に戻る</a>
+    <button type="button" class="cs-btn primary" onclick="window.print()">
+      🖨 印刷 / PDFで保存
+    </button>
+  </div>
+</div>
+
+<div class="cs-page">
+  <h1 class="cs-h1">Huddle Career Story</h1>
+
+  <!-- プロフィールブロック -->
+  <div class="cs-profile">
+    <div>
+      <div class="cs-name-row">
+        <span class="cs-kana">フリガナ</span>
+        <span class="cs-kana">カモメ ハナコ / Hanako Kamome</span>
+      </div>
+      <div class="cs-name-row" style="border-bottom:1px solid #d5dce8;padding-bottom:8px;margin-bottom:6px">
+        <span class="cs-kana">氏名</span>
+        <span class="cs-name">鴎 花子</span>
+      </div>
+      <div class="cs-profile-row"><b>生年月日</b><span class="cs-value">1996年1月1日（満21歳）　性別 女　電話 03-1111-XXXX</span></div>
+      <div class="cs-profile-row"><b>E-mail</b><span class="cs-value">kamomehanako@open-es.com　携帯 090-1111-XXXX</span></div>
+      <div class="cs-profile-row"><b>現住所</b><span class="cs-value">〒100-0001　東京都港区 1-1-XXXX</span></div>
+      <div class="cs-profile-row"><b>帰省先住所</b><span class="cs-value">〒279-0001　千葉県浦安市 1-1-XXXX</span></div>
+    </div>
+    <div class="cs-photo">顔写真</div>
+  </div>
+
+  <!-- 学歴・職歴 -->
+  <table class="cs-history">
+    <thead>
+      <tr><th>年月</th><th>学歴・職歴</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>2008年4月〜2011年3月</td><td>私立鴎中学校</td></tr>
+      <tr><td>2011年4月〜2014年3月</td><td>私立鴎高等学校</td></tr>
+      <tr><td>2014年4月〜2018年3月（見込）</td><td>鴎大学 理工学部 情報学科</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 2カラム -->
+  <div class="cs-grid">
+    <!-- 左カラム -->
+    <div class="cs-col">
+      <div class="cs-box">
+        <div class="cs-label">趣味・特技 <span class="cs-count">100文字〜150文字</span></div>
+        <div class="cs-body cs-empty">記入例が入ります…</div>
+      </div>
+      <div class="cs-box">
+        <div class="cs-label">あなたはどんな人ですか？ <span class="cs-count">250文字〜300文字</span></div>
+        <div class="cs-body">私は、置かれた状況をよく観察し、自分に求められる役割を考えて行動する人間です。大学野球部では、試合に出場できない時期も、自分の成績だけに目を向けるのではなく、練習準備や後輩への声かけ、相手選手の情報共有など、チームに必要なことを考えて取り組みました。目立つ立場でなくても、周囲のためにできることを積み重ね、信頼を得ることにやりがいを感じます。一方で、周囲を優先するあまり自分の意見を控えることがあるため、最近は考えを言葉にして伝えることも意識しています。社会人になっても、組織の目的を理解し、自分にできる役割を見つけ、周囲と協力しながら成果に貢献できる人でありたいです。</div>
+      </div>
+      <div class="cs-box">
+        <div class="cs-label">あなたらしさが伝わる写真 <span class="cs-count">100文字〜150文字</span></div>
+        <div class="cs-body">
+          <div class="cs-hobbypic">
+            <span class="cs-empty">写真の説明が入ります…</span>
+            <div class="cs-photo2">写真</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右カラム -->
+    <div class="cs-col">
+      <div class="cs-box">
+        <div class="cs-label">大学で学んでいること・ゼミ・卒業論文 <span class="cs-count">200文字〜300文字</span></div>
+        <div class="cs-body">私は、置かれた状況をよく観察し、自分に求められる役割を考えて行動する人間です。大学野球部では、試合に出場できない時期も、自分の成績だけに目を向けるのではなく、練習準備や後輩への声かけ、相手選手の情報共有など、チームに必要なことを考えて取り組みました。目立つ立場でなくても、周囲のためにできることを積み重ね、</div>
+      </div>
+      <div class="cs-box">
+        <div class="cs-label">強みと、その根拠となる経験 <span class="cs-count">250文字〜300文字</span></div>
+        <div class="cs-body">強みは、周囲の状況を観察し、必要な役割を考えて行動できることです。大学野球部では、試合に出場しない時も投手の練習相手を務め、ボールの勢いや変化、表情などからその日の状態を確認しました。そして、気づいたことを試合に出る選手や指導者へ共有し、投手が安心して本番へ臨めるよう準備を支えました。自分が目立つことより、チームが勝つために今の自分に何ができるかを考え、必要な情報や準備を先回りして行うことを意識しました。この経験から、周囲をよく見て、相手が力を発揮しやすい状態をつくることが自分の強みだと考えています。</div>
+      </div>
+      <div class="cs-box">
+        <div class="cs-label">別の経験での再現性と活かし方 <span class="cs-count">150文字〜200文字</span></div>
+        <div class="cs-body">この強みは中学生時代にも表れました。練習前の準備が進まない状況で、周囲に求める前に自分が誰よりも早く準備を始め、その行動が徐々にチーム全体へ広がりました。共通しているのは、状況を見て必要なことを考え、まず自分から行動する点です。仕事でも、周囲や顧客の状況を把握し、必要な準備や支援を先回りして行うことで貢献したいです。</div>
+      </div>
+      <div class="cs-box">
+        <div class="cs-label">学生時代に最も力を入れたこと <span class="cs-count">400文字〜450文字</span></div>
+        <div class="cs-body cs-empty">記入例が入ります…</div>
+      </div>
+      <div class="cs-box">
+        <div class="cs-label">組織の中で果たしてきた役割 <span class="cs-count">250文字〜300文字</span></div>
+        <div class="cs-body cs-empty">記入例が入ります…</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cs-hint demo-hide" style="margin-top:8mm;text-align:center;font-size:9pt;color:#8a94a6">
+    ※ 印刷ボタンから「PDFで保存」を選ぶとA4サイズで出力されます
+  </div>
+</div>
+
+</div>
+
 <!-- ================= デモバー ================= -->
 <div aria-label="デモ操作バー" style="position:fixed;left:50%;bottom:12px;transform:translateX(-50%);z-index:99;background:#ffffff;border:1px solid #e6eaf1;border-radius:99px;box-shadow:0 12px 32px -10px rgba(26,58,110,.4);padding:6px 8px;display:flex;align-items:center;gap:8px;max-width:calc(100vw - 16px);overflow-x:auto">
   <div id="roleSeg" style="display:flex;gap:2px;background:#f1f3f8;border-radius:99px;padding:3px;flex-shrink:0">
@@ -1649,7 +1794,8 @@ document.getElementById('copyBtn').addEventListener('click', function () {
     'advisor-student-soukatsu':{ el:'scr-advisor-student', role:'advisor', label:'総括', view:'summary' },
     'advisor-companies':       { el:'scr-advisor-companies', role:'advisor', label:'会社一覧' },
     'advisor-company-detail':  { el:'scr-advisor-company-detail', role:'advisor', label:'会社詳細' },
-    'student-profile':         { el:'scr-student-profile', roles:['student','advisor'], label:'プロフィール' }
+    'student-profile':         { el:'scr-student-profile', roles:['student','advisor'], label:'プロフィール' },
+    'career-story':            { el:'scr-career-story', roles:['student','advisor'], label:'Career Story' }
   };
   const DEFAULTS = { student:'student-home', advisor:'advisor-student' };
   let role = localStorage.getItem('huddle-demo-role') || 'student';
