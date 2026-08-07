@@ -1019,6 +1019,30 @@
     </button>
   </nav>
 
+  <!-- ===== 3-B. 重視軸タブ（5項目 + Career Story） ===== -->
+  <nav aria-label="重視軸タブ" style="margin-top:10px;display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;flex-wrap:wrap">
+    <button type="button" class="ctab" data-cat="proactivity" style="flex-shrink:0;font-size:12px;font-weight:700;padding:9px 14px;border-radius:99px;background:#ffffff;color:#5a6577;border:1px solid #e6eaf1">主体性重視</button>
+    <button type="button" class="ctab" data-cat="collaboration" style="flex-shrink:0;font-size:12px;font-weight:700;padding:9px 14px;border-radius:99px;background:#ffffff;color:#5a6577;border:1px solid #e6eaf1">協働・巻き込み力重視</button>
+    <button type="button" class="ctab" data-cat="problem" style="flex-shrink:0;font-size:12px;font-weight:700;padding:9px 14px;border-radius:99px;background:#ffffff;color:#5a6577;border:1px solid #e6eaf1">課題解決力重視</button>
+    <button type="button" class="ctab" data-cat="continuity" style="flex-shrink:0;font-size:12px;font-weight:700;padding:9px 14px;border-radius:99px;background:#ffffff;color:#5a6577;border:1px solid #e6eaf1">継続力・責任感重視</button>
+    <button type="button" class="ctab" data-cat="challenge" style="flex-shrink:0;font-size:12px;font-weight:700;padding:9px 14px;border-radius:99px;background:#ffffff;color:#5a6577;border:1px solid #e6eaf1">挑戦・成長意欲重視</button>
+    <a href="#career-story" style="flex-shrink:0;display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;padding:9px 14px;border-radius:99px;background:#fdf1e6;color:#c56c26;border:1px solid #f1c9a3;text-decoration:none">🔥 Huddle Career Story</a>
+  </nav>
+
+  <!-- ===== 3-C. カテゴリ別入力ビュー（重視軸タブから開く） ===== -->
+  <div id="view-category" style="display:none;margin-top:14px">
+    <section style="background:#ffffff;border:1px solid #e6eaf1;border-radius:16px;padding:22px;box-shadow:0 6px 18px -12px rgba(26,58,110,.25)">
+      <h2 id="catTitle" style="margin:0;font-size:16px;font-weight:900;color:#1a3a6e">① 主体性重視の学生時代に力を注いだこと</h2>
+      <p id="catGuide" style="margin:8px 0 12px;font-size:12px;color:#5a6577;line-height:1.7">自ら課題や機会を見つけ、周囲を待たずに動いた経験を教えてください。何に気づき、なぜ動こうと決めたのか、具体的な行動と結果、周囲や自分に与えた変化を記載してください。</p>
+      <label style="display:block;font-size:12px;font-weight:700;color:#5a6577;margin-bottom:6px">入力</label>
+      <textarea class="cat-textarea" rows="8" placeholder="400文字〜500文字を目安に入力" style="width:100%;box-sizing:border-box;min-height:200px;resize:vertical;border:1.5px solid #d5dce8;border-radius:10px;padding:14px 16px;font-size:13px;line-height:1.9;background:#fdfdfe;font-family:inherit"></textarea>
+      <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
+        <span id="catCount" style="font-size:11px;color:#8a94a6">0 文字</span>
+        <span style="font-size:11px;color:#8a94a6">自動保存: ✓ 保存済み</span>
+      </div>
+    </section>
+  </div>
+
   <!-- ===== 4-A. 通常時期ビュー（中学校） ===== -->
   <div id="view-normal">
 
@@ -1400,6 +1424,7 @@
   #scr-career-story .cs-label { display:block; font-size:9pt; font-weight:700; color:#1a3a6e; padding:6px 12px; border-bottom:1px solid #1a3a6e; background:#ffffff; }
   #scr-career-story .cs-body { padding:10px 12px; font-size:9.5pt; line-height:1.85; min-height:36pt; }
   #scr-career-story .cs-empty { color:#c4cddb; font-style:italic; font-size:9pt; }
+  #scr-career-story .cs-guide { padding:8px 12px; font-size:8.5pt; line-height:1.7; color:#5a6577; background:#f7f8fb; border-bottom:1px solid #e6eaf1; }
   #scr-career-story .cs-profile { border:1.5px solid #1a3a6e; border-radius:6px; padding:10px 12px; display:grid; grid-template-columns:1fr 90px; gap:12px; align-items:start; }
   #scr-career-story .cs-profile .cs-photo { width:90px; height:110px; background:#f1f3f8; border:1px solid #d5dce8; border-radius:4px; display:flex; align-items:center; justify-content:center; color:#8a94a6; font-size:8pt; }
   #scr-career-story .cs-profile-row { display:grid; grid-template-columns:70px 1fr; gap:6px; font-size:9pt; padding:3px 0; border-bottom:1px dotted #d5dce8; }
@@ -1444,7 +1469,6 @@
 
 <!-- ===== 左シート (A4) ===== -->
 <div class="cs-sheet">
-  <h1 class="cs-h1">Huddle Career Story</h1>
 
   <!-- プロフィールブロック -->
   <div class="cs-profile">
@@ -1480,14 +1504,17 @@
   <!-- 左シート 下段: 趣味・特技 / どんな人 / 写真 -->
   <div class="cs-box">
     <div class="cs-label">趣味・特技 <span class="cs-count">100文字〜150文字</span></div>
+    <div class="cs-guide">あなたの趣味・特技を教えてください。また、それを始めたきっかけ、魅力を感じている点、続けている理由などを記載してください。競技や就職活動以外での興味関心や、日常のあなたらしさが伝わる内容を記載してください。</div>
     <div class="cs-body">趣味は相手投手・打者のデータ分析で、スコアブックから球種の傾向や配球パターンを読み解き、次打者に共有することを続けてきました。特技は野球ノートの継続で、高校から現在まで毎日欠かさず、自分の課題と改善策を言語化しています。</div>
   </div>
   <div class="cs-box">
     <div class="cs-label">あなたはどんな人ですか？ <span class="cs-count">250文字〜300文字</span></div>
+    <div class="cs-guide">あなたはどんな人ですか？あなた自身を一言で表してください。また、その人物像や価値観、考え方が形成された具体的なエピソードと、その経験が現在の行動にどのようにつながっているかを記載してください。</div>
     <div class="cs-body">私は「組織に欠かせないピースになる」ことを大切にする人間です。福岡大学硬式野球部ではキャッチャーとして、投手が力を発揮しやすい状態をつくることを常に意識してきました。試合に出られない時期も、ブルペンでの準備、相手打者の傾向共有、後輩への声かけなど、自分にできる貢献を探し続けました。目立つ立場でなくても、周囲を支えることでチームに必要とされる存在になれると信じています。一方で、周囲を優先するあまり自分の意見を控えることがあるため、必要な場面では相手に伝わる言葉で発信することも意識しています。</div>
   </div>
   <div class="cs-box">
     <div class="cs-label">あなたらしさが伝わる写真 <span class="cs-count">100文字〜150文字</span></div>
+    <div class="cs-guide">あなたらしさが伝わる写真を1枚添付してください。また、その写真を選んだ理由と、写真に表れているあなたの価値観、考え方、周囲との関わり方や役割を記載してください。※競技中の写真に限らず、チームメイトとの関わり、後輩指導、練習準備、ゼミ、アルバイト、地域活動、趣味など、あなたらしさが伝わる写真を選んでください。</div>
     <div class="cs-body">
       <div class="cs-hobbypic">
         <span>福岡大学野球部の春季リーグ戦、ブルペンで先発投手を捕球している場面です。試合に出られなくても、投手が最高のコンディションで登板できるように準備を続けた時期を象徴する一枚です。</span>
@@ -1501,22 +1528,27 @@
 <div class="cs-sheet">
       <div class="cs-box">
         <div class="cs-label">大学で学んでいること・ゼミ・卒業論文 <span class="cs-count">200文字〜300文字</span></div>
+        <div class="cs-guide">大学で学んでいることの中で、特に関心を持って取り組んでいる内容を教えてください。ゼミ・研究室に所属している場合は、活動内容、卒業論文や研究のテーマ、そのテーマを選んだ理由、現在取り組んでいること、学びを通じて身についたことを記載してください。ゼミに所属していない場合は、特に力を入れた授業や学習内容、関心を持った理由、取り組む中で工夫したこと、学びを通じて身についたことを記載してください。</div>
         <div class="cs-body">経済学部でスポーツマーケティングを専攻し、地方プロスポーツクラブの観客動員と地域経済の関係について研究しています。福岡ソフトバンクホークスの試合日程・広告露出と博多エリアの飲食店売上を突き合わせ、「試合日の周辺経済効果」を定量化する卒業論文を執筆中です。データ収集の粗さや因果推定の難しさに苦戦しながらも、指導教員と週次で仮説を検証し、少しずつ形にしています。</div>
       </div>
       <div class="cs-box">
         <div class="cs-label">強みと、その根拠となる経験 <span class="cs-count">250文字〜300文字</span></div>
+        <div class="cs-guide">あなたの強みを一つ教えてください。その強みが最も表れた具体的な経験について、当時の状況や課題、あなたが考えたこと、実際に取った行動、周囲や結果に与えた変化を記載してください。</div>
         <div class="cs-body">強みは、周囲の状況を観察し、必要な役割を考えて先回りで動けることです。大学野球部ではキャッチャーとして、試合に出場しない時も投手の練習相手を務め、ボールの勢いや変化、表情から日々の状態を把握しました。気づいた点は登板前の投手や指導者に共有し、投手が安心して本番に臨める状態を整えました。自分が目立つことより、チームが勝つために今できることを探し、必要な情報や準備を先回りする姿勢を貫いてきました。この経験から、周囲を観察して相手が力を発揮しやすい環境をつくることが自分の強みだと考えています。</div>
       </div>
       <div class="cs-box">
         <div class="cs-label">別の経験での再現性と活かし方 <span class="cs-count">150文字〜200文字</span></div>
+        <div class="cs-guide">その強みが別の経験でも表れた場面を挙げ、二つの経験に共通する考え方や行動を整理してください。最後に、その強みを仕事や組織のどのような場面で活かせると考えているかを記載してください。</div>
         <div class="cs-body">この強みは中学時代にも表れました。学級行事の準備で誰も動かない状況のとき、自分から段取りをつくって周囲に共有し、徐々にクラス全体を巻き込みました。共通するのは、状況を見て必要なことを考え、まず自分から動く点です。仕事でも、顧客や同僚の状況を把握し、必要な支援を先回りして提供することで貢献したいと考えています。</div>
       </div>
       <div class="cs-box">
         <div class="cs-label">学生時代に最も力を入れたこと <span class="cs-count">400文字〜450文字</span></div>
+        <div class="cs-guide">大学生活の中で、最も力を入れて取り組んだことを教えてください。取り組んだ目標、当時の状況や課題、組織における自分の役割、課題をどのように捉えたか、具体的に取った行動、結果、その経験から得た学びを記載してください。部活動や競技に限らず、学業、ゼミ、アルバイト、資格取得、インターンシップ、ボランティア、学生団体、その他の挑戦から選ぶことができます。</div>
         <div class="cs-body">硬式野球部で「レギュラーではないキャッチャー」として、チームに欠かせない存在になることに全力を注ぎました。入部時、同ポジションにプロ内定選手がおり、正捕手争いでは大きく差がついていました。このままではベンチにも入れないと感じ、二つの行動をとりました。一つはファーストと外野の守備練習を追加し、複数ポジションで戦力になる準備をしたこと。もう一つは相手校の投手・打者のデータを毎試合スコアブックにまとめ、正捕手やベンチメンバーへ共有したことです。結果、3年春の九州大会からベンチ入りし、代打・守備固めで出場機会を得ました。4年時にはチームの九州大会優勝に貢献できました。この経験から、限られた条件でも自分の役割を再設計すれば、組織に必要とされる存在になれることを学びました。</div>
       </div>
       <div class="cs-box">
         <div class="cs-label">組織の中で果たしてきた役割 <span class="cs-count">250文字〜300文字</span></div>
+        <div class="cs-guide">部活動、ゼミ、アルバイトなどの組織において、あなたはどのような役割を果たしてきましたか？役職の有無にかかわらず、組織や周囲の状況をどのように捉え、何が必要だと考え、どのような行動を取ったのかを記載してください。また、その行動が周囲や組織にどのような影響を与えたのかも教えてください。</div>
         <div class="cs-body">「1歩後ろから全体を見て、周囲が力を発揮しやすい状態をつくる役割」を担ってきました。キャッチャーとして投手が投げやすいリードを心がけると同時に、寮では野球部のリーダーを任され、部員が生活面で困らないよう先回りで環境を整えました。試合中は捕手として指示を出し、ベンチ外の時は情報共有や後輩の悩み相談に回りました。目立つ場面よりも支える場面で強みを発揮するタイプで、周囲からは「相談しやすい」「頼れる」と言われることが多いです。仕事でも同じ姿勢で、チーム全体の成果に寄与したいと考えています。</div>
       </div>
 </div>
@@ -1782,6 +1814,64 @@ document.getElementById('copyBtn').addEventListener('click', function () {
   const orig = this.textContent;
   this.textContent = '✓ コピーしました';
   setTimeout(() => { this.textContent = orig; }, 2000);
+});
+
+// ===== 重視軸タブ（カテゴリ別入力ビュー） =====
+const CAT_MAP = {
+  proactivity:   { idx:1, title:'主体性重視',        guide:'自ら課題や機会を見つけ、周囲を待たずに動いた経験を教えてください。何に気づき、なぜ動こうと決めたのか、具体的な行動と結果、周囲や自分に与えた変化を記載してください。' },
+  collaboration: { idx:2, title:'協働・巻き込み力重視', guide:'周囲を巻き込み、一人では実現できなかったことを成し遂げた経験を教えてください。関わった人、その人たちにどう働きかけたか、どのようにチームとして機能させたか、得られた結果や学びを記載してください。' },
+  problem:       { idx:3, title:'課題解決力重視',    guide:'複雑な課題やうまくいかない状況に対して、原因を分析し、解決に導いた経験を教えてください。どんな課題で、どう分析し、どんな打ち手を実行し、結果どう変わったのかを記載してください。' },
+  continuity:    { idx:4, title:'継続力・責任感重視', guide:'長期間、地道に継続してきた経験や、責任を持って任務を全うした経験を教えてください。何を、どれくらいの期間、どんな工夫で継続したのか、その結果や周囲への影響を記載してください。' },
+  challenge:     { idx:5, title:'挑戦・成長意欲重視', guide:'これまでで最も挑戦した経験を教えてください。なぜ挑戦しようと思ったのか、直面した困難、乗り越えるためにとった行動、結果と学びを記載してください。' }
+};
+const catTabs = [...document.querySelectorAll('.ctab')];
+const catView = document.getElementById('view-category');
+const catTitle = document.getElementById('catTitle');
+const catGuide = document.getElementById('catGuide');
+const catTextarea = catView && catView.querySelector('.cat-textarea');
+const catCount = document.getElementById('catCount');
+if (catTextarea) {
+  catTextarea.addEventListener('input', () => { catCount.textContent = catTextarea.value.length + ' 文字'; });
+}
+catTabs.forEach((tab) => {
+  tab.addEventListener('click', () => {
+    const cat = CAT_MAP[tab.dataset.cat];
+    if (!cat) return;
+    // 通常ビュー/総括を非表示、カテゴリビューを表示
+    Object.values(views).forEach((el) => { el.style.display = 'none'; });
+    catView.style.display = 'block';
+    catTitle.textContent = '① '.replace('①', ['①','②','③','④','⑤'][cat.idx-1]) + cat.title + 'の学生時代に力を注いだこと';
+    catGuide.textContent = cat.guide;
+    catTextarea.value = '';
+    catCount.textContent = '0 文字';
+    // 時期タブを全て非アクティブ化
+    tabs.forEach((t) => {
+      if (t.dataset.view === 'summary') return;
+      const done = t.textContent.includes('✓');
+      t.style.background = done ? '#e9f0fa' : '#ffffff';
+      t.style.color = done ? '#1a3a6e' : '#8a94a6';
+      t.style.border = done ? '1px solid #e9f0fa' : '1px solid #e6eaf1';
+    });
+    // カテゴリタブのアクティブ表示
+    catTabs.forEach((t) => {
+      const on = t === tab;
+      t.style.background = on ? 'linear-gradient(135deg,#1a3a6e,#2f6fb5)' : '#ffffff';
+      t.style.color = on ? '#ffffff' : '#5a6577';
+      t.style.border = on ? '1px solid transparent' : '1px solid #e6eaf1';
+    });
+    window.scrollTo({ top: catView.offsetTop - 20, behavior: 'smooth' });
+  });
+});
+// 時期タブがクリックされたらカテゴリビューを閉じてカテゴリタブをリセット
+tabs.forEach((tab) => {
+  tab.addEventListener('click', () => {
+    if (catView) catView.style.display = 'none';
+    catTabs.forEach((t) => {
+      t.style.background = '#ffffff';
+      t.style.color = '#5a6577';
+      t.style.border = '1px solid #e6eaf1';
+    });
+  });
 });
 })();
 </script>
